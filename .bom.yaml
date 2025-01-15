@@ -1,8 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 ---
 license: Apache-2.0
-name: bomshell
+name: github.com/protobom/cel
 creator:
- person: Chainguard, Inc
+ person: The Protobom Authors
  tool: bom
 
 artifacts:
@@ -11,36 +13,7 @@ artifacts:
     license: Apache-2.0
     gomodules: true
 
-  - type: file
-    source: bomshell-windows-amd64.exe
-    license: Apache-2.0
-    gomodules: true
-
-  - type: file
-    source: bomshell-darwin-arm64
-    license: Apache-2.0
-    gomodules: true
-
-  - type: file
-    source: bomshell-darwin-amd64
-    license: Apache-2.0
-    gomodules: true
-
-  - type: file
-    source: bomshell-linux-amd64
-    license: Apache-2.0
-    gomodules: true
-
-  - type: file
-    source: bomshell-linux-arm64
-    license: Apache-2.0
-    gomodules: true
-
-  - type: file
-    source: bomshell-linux-arm
-    license: Apache-2.0
-    gomodules: true
-
+  
 
 
 

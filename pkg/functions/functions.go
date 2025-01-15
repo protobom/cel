@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-// SPDX-FileCopyrightText: Copyright 2023 Chainguard Inc
+// SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 
+// Package functions contains the implementation of the functions that are exposed
+// to the CEL environment.
 package functions
 
 import (

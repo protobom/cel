@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
+
 // Package library defined CEL compile and program options in an object that can
 // be used as a library in a CEL environment.
 package library

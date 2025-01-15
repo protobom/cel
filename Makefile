@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: Copyright 2022 Chainguard Inc
 # SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
