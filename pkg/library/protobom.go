@@ -37,7 +37,7 @@ func (p *Protobom) Types() []cel.EnvOption {
 func (p *Protobom) Variables() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Variable("sboms", cel.MapType(cel.IntType, elements.DocumentType)),
-		cel.Variable("bomshell", elements.BomshellType),
+		cel.Variable("protobom", elements.ProtobomType),
 	}
 }
 

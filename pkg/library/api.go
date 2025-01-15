@@ -130,8 +130,8 @@ func (p *Protobom) Functions() []cel.EnvOption {
 		cel.Function(
 			"LoadSBOM",
 			cel.MemberOverload(
-				"bomshell_loadsbom_binding",
-				[]*cel.Type{elements.BomshellType, cel.StringType}, elements.DocumentType,
+				"protobom_loadsbom_binding",
+				[]*cel.Type{elements.ProtobomType, cel.StringType}, elements.DocumentType,
 				cel.BinaryBinding(functions.LoadSBOM),
 			),
 		),

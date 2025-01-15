@@ -98,7 +98,7 @@ func (bs *Bomshell) Run(code string) (ref.Val, error) {
 	}
 
 	// Add the default bomshell object
-	vars["bomshell"] = elements.Bomshell{}
+	vars["bomshell"] = elements.Protobom{}
 
 	ast, err := bs.impl.Compile(bs.runner, code)
 	if err != nil {
