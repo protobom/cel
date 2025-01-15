@@ -11,7 +11,6 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/protobom/cel/pkg/elements"
 	"github.com/protobom/protobom/pkg/formats"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -85,7 +84,6 @@ func (bs *Bomshell) Run(code string) (ref.Val, error) {
 			if err != nil {
 				return nil, fmt.Errorf("loading SBOM: %w", err)
 			}
-			logrus.Debugf("Loaded %s", sbomSpec)
 
 			sbomList = append(sbomList, doc)
 		}
@@ -111,20 +109,6 @@ func (bs *Bomshell) Run(code string) (ref.Val, error) {
 	}
 
 	return result, nil
-}
-
-func (bs *Bomshell) LoadSBOM(path string) (*elements.Document, error) {
-	f, err := bs.impl.OpenFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("opening SBOM file: %w", err)
-	}
-
-	doc, err := bs.impl.LoadSBOM(f)
-	if err != nil {
-		return nil, fmt.Errorf("loading SBOM: %w", err)
-	}
-
-	return doc, nil
 }
 
 // PrintResult writes result into writer w according to the format

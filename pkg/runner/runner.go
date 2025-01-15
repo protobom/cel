@@ -1,14 +1,33 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 
-package shell
+package runner
 
 import (
 	"fmt"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/ext"
+
+	"github.com/protobom/protobom/pkg/formats"
+
+	"github.com/protobom/cel/pkg/library"
 )
+
+const (
+	DefaultFormat = formats.SPDX23JSON
+)
+
+type Options struct {
+	SBOMs      []string
+	Format     formats.Format
+	EnvOptions []cel.EnvOption
+}
+
+var defaultOptions = Options{
+	Format: DefaultFormat,
+}
 
 type Runner struct {
 	Environment *cel.Env
@@ -59,4 +78,24 @@ func (r *Runner) EvaluateAST(ast *cel.Ast, variables map[string]interface{}) (re
 	}
 
 	return result, nil
+}
+
+func createEnvironment(opts *Options) (*cel.Env, error) {
+	envOpts := []cel.EnvOption{
+		library.NewProtobom().EnvOption(),
+		ext.Bindings(),
+		ext.Strings(),
+		ext.Encoders(),
+	}
+
+	// Add any additional environment options passed in the construcutor
+	envOpts = append(envOpts, opts.EnvOptions...)
+	env, err := cel.NewEnv(
+		envOpts...,
+	)
+	if err != nil {
+		return nil, (fmt.Errorf("creating CEL environment: %w", err))
+	}
+
+	return env, nil
 }

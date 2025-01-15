@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 
-package shell
+package runner
 
 import (
 	"fmt"
