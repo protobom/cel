@@ -11,7 +11,10 @@ import (
 	"github.com/google/cel-go/ext"
 
 	"github.com/protobom/protobom/pkg/formats"
+	"github.com/protobom/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/sbom"
 
+	"github.com/protobom/cel/pkg/elements"
 	"github.com/protobom/cel/pkg/library"
 )
 
@@ -27,6 +30,11 @@ type Options struct {
 
 var defaultOptions = Options{
 	Format: DefaultFormat,
+	EnvOptions: []cel.EnvOption{
+		ext.Bindings(),
+		ext.Strings(),
+		ext.Encoders(),
+	},
 }
 
 type Runner struct {
@@ -39,7 +47,7 @@ func NewRunner() (*Runner, error) {
 }
 
 func NewRunnerWithOptions(opts *Options) (*Runner, error) {
-	env, err := createEnvironment(opts)
+	env, err := CreateEnvironment(opts)
 	if err != nil {
 		return nil, err
 	}
@@ -51,45 +59,31 @@ func NewRunnerWithOptions(opts *Options) (*Runner, error) {
 	return &runner, nil
 }
 
-// Compile reads CEL code from string, compiles it and
-// returns the Abstract Syntax Tree (AST). The AST can then be evaluated
-// in the environment. As compilation of the AST is expensive, it can
-// be cached for better performance.
-func (r *Runner) Compile(code string) (*cel.Ast, error) {
-	// Run the compilation step
+func (r *Runner) Evaluate(code string, variables *map[string]any) (ref.Val, error) {
 	ast, err := r.impl.Compile(r.Environment, code)
 	if err != nil {
-		return nil, fmt.Errorf("compiling program: %w", err)
-	}
-	return ast, nil
-}
-
-// EvaluateAST evaluates a CEL syntax tree on an SBOM. Returns the program
-// evaluation result or an error.
-func (r *Runner) EvaluateAST(ast *cel.Ast, variables map[string]interface{}) (ref.Val, error) {
-	program, err := r.Environment.Program(ast, cel.EvalOptions(cel.OptOptimize))
-	if err != nil {
-		return nil, fmt.Errorf("generating program from AST: %w", err)
+		return nil, fmt.Errorf("compilation error: %w", err)
 	}
 
-	result, _, err := program.Eval(variables)
+	val, err := r.impl.Evaluate(r.Environment, ast, variables)
 	if err != nil {
 		return nil, fmt.Errorf("evaluation error: %w", err)
 	}
 
-	return result, nil
+	return val, nil
 }
 
-func createEnvironment(opts *Options) (*cel.Env, error) {
+// CreateEnvironment creates a CEL environment with the protobom
+// library loaded.
+func CreateEnvironment(opts *Options) (*cel.Env, error) {
 	envOpts := []cel.EnvOption{
 		library.NewProtobom().EnvOption(),
-		ext.Bindings(),
-		ext.Strings(),
-		ext.Encoders(),
 	}
 
-	// Add any additional environment options passed in the construcutor
+	// Add any additional environment options defined in the options
 	envOpts = append(envOpts, opts.EnvOptions...)
+
+	// Create the CEL environment
 	env, err := cel.NewEnv(
 		envOpts...,
 	)
@@ -98,4 +92,58 @@ func createEnvironment(opts *Options) (*cel.Env, error) {
 	}
 
 	return env, nil
+}
+
+type varBuilderOptions struct {
+	Paths     []string
+	Documents []*sbom.Document
+}
+
+type varBuilderOption func(*varBuilderOptions)
+
+func WithPaths(paths []string) varBuilderOption {
+	return func(opts *varBuilderOptions) {
+		opts.Paths = paths
+	}
+}
+
+func WithDocuments(docs []*sbom.Document) varBuilderOption {
+	return func(opts *varBuilderOptions) {
+		opts.Documents = docs
+	}
+}
+
+func BuildVariables(optsFn ...varBuilderOption) (*map[string]any, error) {
+	opts := &varBuilderOptions{}
+	for _, f := range optsFn {
+		f(opts)
+	}
+	sbomList := []*elements.Document{}
+
+	// Load the specified SBOM files
+	r := reader.New()
+	// Load defined SBOMs into the sboms array
+	for _, path := range opts.Paths {
+		doc, err := r.ParseFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("parsing %q: %w", path, err)
+		}
+		sbomList = append(sbomList, &elements.Document{
+			Document: doc,
+		})
+	}
+
+	// Add any preloaded documents to the list:
+	for _, doc := range opts.Documents {
+		sbomList = append(sbomList, &elements.Document{
+			Document: doc,
+		})
+	}
+
+	// Add the SBOM list to the runtim environment
+	return &map[string]any{
+		"protobom": elements.Protobom{},
+		"sboms":    sbomList,
+	}, nil
+
 }
