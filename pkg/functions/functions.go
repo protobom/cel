@@ -11,11 +11,13 @@ import (
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"github.com/protobom/cel/pkg/elements"
-	"github.com/protobom/cel/pkg/loader"
-	"github.com/protobom/protobom/pkg/sbom"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"sigs.k8s.io/release-utils/version"
+
+	"github.com/protobom/protobom/pkg/reader"
+	"github.com/protobom/protobom/pkg/sbom"
+
+	"github.com/protobom/cel/pkg/elements"
 )
 
 // ToNodeList takes a node and returns a new NodeList
@@ -224,10 +226,12 @@ var LoadSBOM = func(_, pathVal ref.Val) ref.Val {
 		return types.NewErr("opening SBOM file: %w", err)
 	}
 
-	doc, err := loader.ReadSBOM(f)
+	r := reader.New()
+	doc, err := r.ParseStream(f)
 	if err != nil {
-		return types.NewErr("loading document: %w", err)
+		return types.NewErr("parsing SBOM: %w", err)
 	}
+
 	return elements.Document{
 		Document: doc,
 	}
