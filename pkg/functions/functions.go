@@ -45,7 +45,7 @@ var ToNodeList = func(lhs ref.Val) ref.Val {
 		}.ToNodeList()
 		return *nl
 	default:
-		return types.NewErr("type does not support conversion to NodeList" + fmt.Sprintf("%T", v))
+		return types.NewErr("type %T does not support conversion to NodeList", v)
 	}
 }
 
@@ -98,7 +98,7 @@ var NodeByID = func(lhs, rawID ref.Val) ref.Val {
 var Files = func(lhs ref.Val) ref.Val {
 	nodeList, err := getTypedNodes(lhs, sbom.Node_FILE)
 	if err != nil {
-		return types.NewErr(err.Error())
+		return types.NewErr("searching for files: %w", err)
 	}
 	return nodeList
 }
@@ -111,7 +111,7 @@ var Files = func(lhs ref.Val) ref.Val {
 var Packages = func(lhs ref.Val) ref.Val {
 	nodeList, err := getTypedNodes(lhs, sbom.Node_PACKAGE)
 	if err != nil {
-		return types.NewErr(err.Error())
+		return types.NewErr("searching for packages: %w", err)
 	}
 	return nodeList
 }
@@ -278,14 +278,14 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	case *sbom.Document:
 		// FIXME: Lookup reltype
 		if err := v.NodeList.RelateNodeListAtID(nodelist.Value().(*sbom.NodeList), id, sbom.Edge_dependsOn); err != nil {
-			return types.NewErr(err.Error())
+			return types.NewErr("relating nodelist: %w", err)
 		}
 		return elements.Document{
 			Document: v,
 		}
 	case *sbom.NodeList:
 		if err := v.RelateNodeListAtID(nodelist.Value().(*sbom.NodeList), id, sbom.Edge_dependsOn); err != nil {
-			return types.NewErr(err.Error())
+			return types.NewErr("relating nodelist: %w", err)
 		}
 		return elements.NodeList{
 			NodeList: v,
