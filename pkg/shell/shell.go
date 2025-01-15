@@ -96,6 +96,7 @@ func (bs *Bomshell) Run(code string) (ref.Val, error) {
 	if len(sbomList) > 0 {
 		vars["sbom"] = sbomList[0]
 	}
+
 	// Add the default bomshell object
 	vars["bomshell"] = elements.Bomshell{}
 
