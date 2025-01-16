@@ -1,4 +1,4 @@
-// This is an example of SBOM composition using bomshell.
+// This is an example of SBOM composition using the Protobom/CEL integration.
 //
 // === BEGIN CODE === 
 
@@ -58,11 +58,7 @@ sboms[0].RelateNodeListAtID(
 // - go (the application source)
 // - githubactions (from the repository CI)
 //
-// The following bomshell program extracts the go dependencies from the second
+// The following CEL program extracts the go dependencies from the second
 // SBOM and remixes them into the first to enrich its data. He resulting SBOM
 // describes the full dependency list of the binary.
-//
-// To run the composing example, run the following bomshell invocation:
-// 
-// bomshell exec compose.cel bom-binary.spdx.json bom-github.spdx.json
 //

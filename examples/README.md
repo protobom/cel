@@ -1,8 +1,8 @@
-# Example bomshell programs
+# Example Protobom/CEL Programs
 
 This directory contains a number of example programs that can be used to 
-understand how bomshell works. Each program is simple enough to demo a
-single feature of bomshell.
+understand how the protobom CEL integration works. Each program is simple
+enough to demo a single feature or function.
 
 The following list has a summary of the files, open each `.cel` file to 
 read the full documentation of the example and instructions on how to run it.
@@ -16,7 +16,7 @@ Example SBOMs used to run these examples are also found in this directory.
 | [compose.cel](compose.cel) | Example of SBOM composition using `RelateNodeListAtID()` |
 | [files.cel](files.cel) | Generate a new SBOM containing only the files found in an SBOM. |
 | [packages.cel](packages.cel) | Generate a new SBOM containing only the packages found in an SBOM. |
-| [loadsbom.cel](loadsbom.cel) | Demo of SBOM loading directly from bomshell. |
+| [loadsbom.cel](loadsbom.cel) | Demo of SBOM loading directly from the CEL environment. |
 | [nodesbypurltype.cel](nodesbypurltype.cel) | Example showing how to extract all nodes of a certain purl type. |
 | [getnodebyid.cel](getnodebyid.cel) | Demo querying an SBOM for a specific node. |
 

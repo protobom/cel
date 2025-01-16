@@ -1,10 +1,10 @@
-// Read an SBOM from disk. This expression evaluates to the SBOM document.
+// Read an SBOM from disk. This expression evaluates to a Protobom document.
 // You can use this construct to feed a document into functions that expect
 // them. 
 // 
-// To store an SBOM document in a variable use the native bind function
+// To store an SBOM document in a variable, use the native bind function
 // the CEL runtime:
 //
-// cel.bind(myvar, bomshell.LoadSBOM("examples/curl.spdx.json"), myvar)
+// cel.bind(myvar, protobom.LoadSBOM("examples/curl.spdx.json"), myvar)
 // 
-bomshell.LoadSBOM("examples/curl.spdx.json")
+protobom.LoadSBOM("examples/curl.spdx.json")

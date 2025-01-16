@@ -1,7 +1,7 @@
 # Functions Inventory
 
 This is an initial inventory of the functions planned for each of the three
-objects currently exposed to the bomshell runtime environment:
+objects currently exposed to the CEL runtime environment:
 
 | method | Return Value | Description | SBOM | NodeList | Node |
 | --- | --- | --- | --- | --- | --- |
