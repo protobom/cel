@@ -27,16 +27,28 @@ jobs:
 
       - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
         with:
-          go-version: '1.21'
-          check-latest: true
+          go-version-file: go.mod
+          cache: false
 
       - name: Install cosign
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
 
       - name: Install bom
-        uses: puerco/release-actions/setup-bom@6c88cda6495b4415966e61f20798fb96a9081397 # main
+        uses: kubernetes-sigs/release-actions/setup-bom@a69972745f85aab4ba5d6c681e2a0e7f73eaff2b # v0.3.0
 
       - name: Get TAG
         id: get_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Generate SBOM
+        shell: bash
+        run: |
+          bom generate --format=json -o /tmp/protobom-cel-$TAG.spdx.json .
+
+      - name: Publish Release
+        uses: kubernetes-sigs/release-actions/publish-release@a69972745f85aab4ba5d6c681e2a0e7f73eaff2b # v0.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          assets: "/tmp/protobom-cel-$TAG.spdx.json"
+          sbom: false
