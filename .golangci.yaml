@@ -1,9 +1,7 @@
-# SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 ---
 run:
   concurrency: 6
-  deadline: 5m
+  timeout: 5m
 issues:
   exclude-rules:
     # counterfeiter fakes are usually named 'fake_<something>.go'
@@ -30,13 +28,13 @@ linters:
     - errcheck
     # - goconst Disabled temporarily as we need to const away all the relationships
     - gocritic
-    - gocyclo # Disables until some functions are optimized
-    # - godox
+    # - gocyclo Disables until some functions are optimized
+    - godox
     - gofmt
     - gofumpt
     - goheader
     - goimports
-    # - gomoddirectives
+    - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
@@ -51,7 +49,7 @@ linters:
     - prealloc
     - predeclared
     - promlinter
-    # - revive Disabled for now as we have lots of uppercase consts
+    - revive # Disabled for now as we have lots of uppercase consts
     - staticcheck
     - stylecheck
     - typecheck
@@ -67,7 +65,7 @@ linters:
     # - forbidigo
     # - forcetypeassert
     # - funlen
-    # - gci
+    - gci
     # - gochecknoglobals
     # - gochecknoinits
     # - gocognit
@@ -87,15 +85,20 @@ linters:
     # - thelper
     # - tparallel
     # - wastedassign
-    - wrapcheck
+    # - wrapcheck
     # - wsl
+linters-settings:
+  depguard:
+    list-type: blacklist
+    include-go-root: true
+    include-go-std-lib: true
   gci:
     no-inline-comments: false
     no-prefix-comments: true
     sections:
       - standard
       - default
-      - prefix(github.com/protobom/protobom)
+      - prefix(github.com/protobom/cel)
 
     section-separators:
       - newLine
@@ -110,22 +113,8 @@ linters:
   gocritic:
     enabled-checks:
       # Diagnostic
-      - appendAssign
-      - argOrder
-      - badCond
-      - caseOrder
-      - codegenComment
       - commentedOutCode
-      - deprecatedComment
-      - dupArg
-      - dupBranchBody
-      - dupCase
-      - dupSubExpr
-      - exitAfterDefer
-      - flagDeref
-      - flagName
       - nilValReturn
-      - offBy1
       - sloppyReassign
       - weakCond
       - octalLiteral
@@ -139,31 +128,16 @@ linters:
       - rangeValCopy
 
       # Style
-      - assignOp
       - boolExprSimplify
-      - captLocal
-      - commentFormatting
       - commentedOutImport
-      - defaultCaseOrder
       - docStub
-      - elseif
       - emptyFallthrough
       - emptyStringTest
       - hexLiteral
       - methodExprCall
-      - regexpMust
-      - singleCaseSwitch
-      - sloppyLen
       - stringXbytes
-      - switchTrue
       - typeAssertChain
-      - typeSwitchVar
-      - underef
       - unlabelStmt
-      - unlambda
-      - unslice
-      - valSwap
-      - wrapperFunc
       - yodaStyleExpr
       # - ifElseChain
 
