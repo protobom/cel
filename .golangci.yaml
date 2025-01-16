@@ -3,6 +3,8 @@ run:
   concurrency: 6
   timeout: 5m
 issues:
+  exclude-dirs:
+    - tmp/*
   exclude-rules:
     # counterfeiter fakes are usually named 'fake_<something>.go'
     - path: fake_.*\.go
@@ -169,7 +171,7 @@ linters-settings:
     rules:
       - name: add-constant
         arguments:
-          - allowInts: "0"
+          - allowInts: "0,1,2,3,4,5,6,7,8,9"
       - name: line-length-limit
         disabled: true
       - name: function-length

@@ -12,8 +12,3 @@ artifacts:
     source: ../
     license: Apache-2.0
     gomodules: true
-
-  
-
-
-

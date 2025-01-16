@@ -8,5 +8,6 @@ test:
 
 .PHONY: sbom
 sbom:
-	cd dist && bom generate -c ../.bom.yaml -o sbom.spdx.json --format=json
+	mkdir dist || :
+	bom generate -c .bom.yaml -o dist/protobom-cel.spdx.json --format=json
 
