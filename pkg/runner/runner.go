@@ -51,6 +51,10 @@ func NewRunnerWithOptions(opts *Options) (*Runner, error) {
 	return &runner, nil
 }
 
+// Evaluate evaluates the CEL `code“ passed as a string predefining the
+// variaables passed in `variables`. The function returns the raw ref.Val
+// meaning that any cel expression returning an error will not return err but
+// will set the err in the return value.
 func (r *Runner) Evaluate(code string, variables *map[string]any) (ref.Val, error) {
 	ast, err := r.impl.Compile(r.Environment, code)
 	if err != nil {
@@ -105,6 +109,15 @@ func WithDocuments(docs []*sbom.Document) varBuilderOption {
 	}
 }
 
+// BuildVariables provides a mechanism to populate the variables
+// map that can be exposed in the CEl environment. The function
+// takes functional options to define the SBOMs that are made available
+// to the evaluator passing protobom Documents or paths to native SBOMs:
+//
+//	vars, err := BuildVariables(
+//	   WithPaths([]string{"sbom1.spdx.json", "sbom2.cdx.json"}),
+//	   WithDocuments(sbom.NewDocument())
+//	)
 func BuildVariables(optsFn ...varBuilderOption) (*map[string]any, error) {
 	opts := &varBuilderOptions{}
 	for _, f := range optsFn {
@@ -137,5 +150,4 @@ func BuildVariables(optsFn ...varBuilderOption) (*map[string]any, error) {
 		"protobom": elements.Protobom{},
 		"sboms":    sbomList,
 	}, nil
-
 }

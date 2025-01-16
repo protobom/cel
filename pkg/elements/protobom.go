@@ -30,8 +30,9 @@ func (p *Protobom) ConvertToType(typeVal ref.Type) ref.Val {
 	switch typeVal {
 	case types.TypeType:
 		return ProtobomType
+	default:
+		return types.NewErr("type conversion not allowed for protobom")
 	}
-	return types.NewErr("type conversion not allowed for protobom")
 }
 
 // Equal implements ref.Val.Equal.
