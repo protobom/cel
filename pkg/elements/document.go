@@ -20,7 +20,7 @@ type Document struct {
 }
 
 // ConvertToNative implements ref.Val.ConvertToNative.
-func (d Document) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
+func (d Document) ConvertToNative(typeDesc reflect.Type) (any, error) {
 	if reflect.TypeOf(d).AssignableTo(typeDesc) {
 		return d, nil
 	} else if reflect.TypeOf(d.Document).AssignableTo(typeDesc) {
@@ -59,6 +59,6 @@ func (d Document) Type() ref.Type {
 }
 
 // Value implements ref.Val.Value.
-func (d Document) Value() interface{} {
+func (d Document) Value() any {
 	return d.Document
 }

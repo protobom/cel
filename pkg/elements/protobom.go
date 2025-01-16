@@ -24,7 +24,7 @@ var (
 // of the protobom elements.
 type Protobom struct{}
 
-func (*Protobom) ConvertToNative(reflect.Type) (interface{}, error) {
+func (*Protobom) ConvertToNative(reflect.Type) (any, error) {
 	return nil, errors.New("protobom objects cannot be converted to native")
 }
 
@@ -48,6 +48,6 @@ func (*Protobom) Type() ref.Type {
 }
 
 // Value implements ref.Val.Value.
-func (p *Protobom) Value() interface{} {
+func (p *Protobom) Value() any {
 	return p
 }

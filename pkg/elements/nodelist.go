@@ -24,7 +24,7 @@ type NodeList struct {
 }
 
 // ConvertToNative implements ref.Val.ConvertToNative.
-func (nl NodeList) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
+func (nl NodeList) ConvertToNative(typeDesc reflect.Type) (any, error) {
 	if reflect.TypeOf(nl).AssignableTo(typeDesc) {
 		return nl, nil
 	} else if reflect.TypeOf(nl.NodeList).AssignableTo(typeDesc) {
@@ -63,7 +63,7 @@ func (nl NodeList) Type() ref.Type {
 }
 
 // Value implements ref.Val.Value.
-func (nl NodeList) Value() interface{} {
+func (nl NodeList) Value() any {
 	return nl.NodeList
 }
 

@@ -12,7 +12,7 @@ import (
 
 type TypeAdapter struct{}
 
-func (TypeAdapter) NativeToValue(value interface{}) ref.Val {
+func (TypeAdapter) NativeToValue(value any) ref.Val {
 	val, ok := value.(elements.Protobom)
 	if ok {
 		return &val
