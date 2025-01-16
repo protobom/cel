@@ -10,7 +10,6 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/ext"
 
-	"github.com/protobom/protobom/pkg/formats"
 	"github.com/protobom/protobom/pkg/reader"
 	"github.com/protobom/protobom/pkg/sbom"
 
@@ -18,18 +17,11 @@ import (
 	"github.com/protobom/cel/pkg/library"
 )
 
-const (
-	DefaultFormat = formats.SPDX23JSON
-)
-
 type Options struct {
-	SBOMs      []string
-	Format     formats.Format
 	EnvOptions []cel.EnvOption
 }
 
 var defaultOptions = Options{
-	Format: DefaultFormat,
 	EnvOptions: []cel.EnvOption{
 		ext.Bindings(),
 		ext.Strings(),
