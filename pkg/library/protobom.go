@@ -23,7 +23,7 @@ func NewProtobom() *Protobom {
 }
 
 // Types returns the types that the library defines in the CEL environment
-func (p *Protobom) Types() []cel.EnvOption {
+func (*Protobom) Types() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Types(elements.DocumentType),
 		cel.Types(&sbom.Document{}),
@@ -34,7 +34,7 @@ func (p *Protobom) Types() []cel.EnvOption {
 
 // Variables defines the global variables that are created in the CEL
 // environment when the library is included
-func (p *Protobom) Variables() []cel.EnvOption {
+func (*Protobom) Variables() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Variable("sboms", cel.MapType(cel.IntType, elements.DocumentType)),
 		cel.Variable("protobom", elements.ProtobomType),
@@ -43,7 +43,7 @@ func (p *Protobom) Variables() []cel.EnvOption {
 
 // TypeAdapters wraps the protobom custom type adapter into an option
 // that can be injected into the CEL environment
-func (p *Protobom) TypeAdapters() []cel.EnvOption {
+func (*Protobom) TypeAdapters() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.CustomTypeAdapter(&TypeAdapter{}),
 	}
@@ -62,12 +62,12 @@ func (p *Protobom) CompileOptions() []cel.EnvOption {
 
 // ProgramOptions is here to implement the cel library interface, currently
 // none are supported.
-func (p *Protobom) ProgramOptions() []cel.ProgramOption {
+func (*Protobom) ProgramOptions() []cel.ProgramOption {
 	return []cel.ProgramOption{}
 }
 
 // LibraryName returns the library name as defined in the Name constant
-func (p *Protobom) LibraryName() string {
+func (*Protobom) LibraryName() string {
 	return Name
 }
 

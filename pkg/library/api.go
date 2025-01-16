@@ -13,7 +13,7 @@ import (
 
 // Functions returns the compile-time options that define the functions that
 // the protobom library exposes to the cel environment.
-func (p *Protobom) Functions() []cel.EnvOption {
+func (*Protobom) Functions() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Function(
 			"files",

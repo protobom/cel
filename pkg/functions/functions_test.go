@@ -48,7 +48,7 @@ func TestToNodeList(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			res := ToNodeList(tc.sut)
 			require.NotNil(t, res)
-			require.Equal(t, "elements.NodeList", fmt.Sprintf("%T", res), res)
+			require.Equal(t, "*elements.NodeList", fmt.Sprintf("%T", res), res)
 		})
 	}
 }
@@ -91,7 +91,7 @@ func TestNodeByID(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			res := NodeByID(tc.sut, types.String("mynode"))
 			require.NotNil(t, res)
-			require.Equal(t, "elements.Node", fmt.Sprintf("%T", res), res)
+			require.Equal(t, "*elements.Node", fmt.Sprintf("%T", res), res)
 			n, ok := res.Value().(*sbom.Node)
 			require.True(t, ok)
 			require.Equal(t, "mynode", n.Id)

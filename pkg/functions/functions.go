@@ -24,40 +24,38 @@ import (
 var ToNodeList = func(lhs ref.Val) ref.Val {
 	switch v := lhs.Value().(type) {
 	case *sbom.Document:
-		return elements.NodeList{
+		return &elements.NodeList{
 			NodeList: v.NodeList,
 		}
 	case *elements.Document:
-		return elements.NodeList{
+		return &elements.NodeList{
 			NodeList: v.Document.NodeList,
 		}
 	case *sbom.NodeList:
-		return elements.NodeList{
+		return &elements.NodeList{
 			NodeList: v,
 		}
 	case *elements.NodeList:
 		return v
 	case *elements.Node:
 		nl := v.ToNodeList()
-		return *nl
+		return nl
 	case *sbom.Node:
-		nl := elements.Node{
-			Node: v,
-		}.ToNodeList()
-		return *nl
+		nl := (&elements.Node{Node: v}).ToNodeList()
+		return nl
 	default:
 		return types.NewErr("type %T does not support conversion to NodeList", v)
 	}
 }
 
 var Addition = func(_, _ ref.Val) ref.Val {
-	return elements.NodeList{
+	return &elements.NodeList{
 		NodeList: &sbom.NodeList{},
 	}
 }
 
 var AdditionOp = func(...ref.Val) ref.Val {
-	return elements.NodeList{
+	return &elements.NodeList{
 		NodeList: &sbom.NodeList{},
 	}
 }
@@ -86,7 +84,7 @@ var NodeByID = func(lhs, rawID ref.Val) ref.Val {
 		return nil
 	}
 
-	return elements.Node{
+	return &elements.Node{
 		Node: node,
 	}
 }
@@ -101,7 +99,7 @@ var Files = func(lhs ref.Val) ref.Val {
 	if err != nil {
 		return types.NewErr("searching for files: %w", err)
 	}
-	return nodeList
+	return &nodeList
 }
 
 // Packages returns a NodeList with any packages in the lhs element. It supports
@@ -114,7 +112,7 @@ var Packages = func(lhs ref.Val) ref.Val {
 	if err != nil {
 		return types.NewErr("searching for packages: %w", err)
 	}
-	return nodeList
+	return &nodeList
 }
 
 // getTypedNodes takes an element and returns a nodelist containing all nodes
@@ -180,7 +178,7 @@ var ToDocument = func(lhs ref.Val) ref.Val {
 	case *elements.Node:
 		nodelist = v.ToNodeList()
 	case *sbom.Node:
-		nodelist = elements.Node{Node: v}.ToNodeList()
+		nodelist = (&elements.Node{Node: v}).ToNodeList()
 	default:
 		return types.NewErr("unable to convert element to document")
 	}
@@ -191,7 +189,7 @@ var ToDocument = func(lhs ref.Val) ref.Val {
 	// nodes in the graph.
 	reconnectOrphanNodes(nodelist)
 
-	doc := elements.Document{
+	doc := &elements.Document{
 		Document: &sbom.Document{
 			Metadata: &sbom.Metadata{
 				Id:      "",
@@ -232,7 +230,7 @@ var LoadSBOM = func(_, pathVal ref.Val) ref.Val {
 		return types.NewErr("parsing SBOM: %w", err)
 	}
 
-	return elements.Document{
+	return &elements.Document{
 		Document: doc,
 	}
 }
@@ -253,7 +251,7 @@ var NodesByPurlType = func(lhs, rhs ref.Val) ref.Val {
 		return types.NewErr("method unsupported on type %T", lhs.Value())
 	}
 
-	return elements.NodeList{
+	return &elements.NodeList{
 		NodeList: nl,
 	}
 }
@@ -273,7 +271,7 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 		return types.NewErr("relationship type has has to be a string")
 	}
 
-	nodelist, ok := vals[1].(elements.NodeList)
+	nodelist, ok := vals[1].(*elements.NodeList)
 	if !ok {
 		return types.NewErr("could not cast nodelist")
 	}
@@ -284,14 +282,14 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 		if err := v.NodeList.RelateNodeListAtID(nodelist.NodeList, id, sbom.Edge_dependsOn); err != nil {
 			return types.NewErr("relating nodelist: %w", err)
 		}
-		return elements.Document{
+		return &elements.Document{
 			Document: v,
 		}
 	case *sbom.NodeList:
 		if err := v.RelateNodeListAtID(nodelist.NodeList, id, sbom.Edge_dependsOn); err != nil {
 			return types.NewErr("relating nodelist: %w", err)
 		}
-		return elements.NodeList{
+		return &elements.NodeList{
 			NodeList: v,
 		}
 	default:

@@ -13,6 +13,10 @@ import (
 )
 
 func TestCleanEdges(t *testing.T) {
+	const (
+		node1 = "node1"
+		node2 = "node2"
+	)
 	for _, tc := range []struct {
 		sut      *elements.NodeList
 		expected *elements.NodeList
@@ -22,31 +26,31 @@ func TestCleanEdges(t *testing.T) {
 			sut: &elements.NodeList{
 				NodeList: &sbom.NodeList{
 					Nodes: []*sbom.Node{
-						{Id: "node1"}, {Id: "node2"},
+						{Id: node1}, {Id: node2},
 					},
 					Edges: []*sbom.Edge{
 						{
-							Type: 0,
-							From: "node1",
-							To:   []string{"node2"},
+							Type: sbom.Edge_UNKNOWN,
+							From: node1,
+							To:   []string{node2},
 						},
 					},
-					RootElements: []string{"node1"},
+					RootElements: []string{node1},
 				},
 			},
 			expected: &elements.NodeList{
 				NodeList: &sbom.NodeList{
 					Nodes: []*sbom.Node{
-						{Id: "node1"}, {Id: "node2"},
+						{Id: node1}, {Id: node2},
 					},
 					Edges: []*sbom.Edge{
 						{
-							Type: 0,
-							From: "node1",
-							To:   []string{"node2"},
+							Type: sbom.Edge_UNKNOWN,
+							From: node1,
+							To:   []string{node2},
 						},
 					},
-					RootElements: []string{"node1"},
+					RootElements: []string{node1},
 				},
 			},
 		},
@@ -55,31 +59,31 @@ func TestCleanEdges(t *testing.T) {
 			sut: &elements.NodeList{
 				NodeList: &sbom.NodeList{
 					Nodes: []*sbom.Node{
-						{Id: "node1"}, {Id: "node2"},
+						{Id: node1}, {Id: node2},
 					},
 					Edges: []*sbom.Edge{
 						{
-							Type: 0,
-							From: "node1",
-							To:   []string{"node2", "node3"},
+							Type: sbom.Edge_UNKNOWN,
+							From: node1,
+							To:   []string{node2, "node3"},
 						},
 					},
-					RootElements: []string{"node1"},
+					RootElements: []string{node1},
 				},
 			},
 			expected: &elements.NodeList{
 				NodeList: &sbom.NodeList{
 					Nodes: []*sbom.Node{
-						{Id: "node1"}, {Id: "node2"},
+						{Id: node1}, {Id: node2},
 					},
 					Edges: []*sbom.Edge{
 						{
-							Type: 0,
-							From: "node1",
-							To:   []string{"node2"},
+							Type: sbom.Edge_UNKNOWN,
+							From: node1,
+							To:   []string{node2},
 						},
 					},
-					RootElements: []string{"node1"},
+					RootElements: []string{node1},
 				},
 			},
 		},
@@ -88,25 +92,25 @@ func TestCleanEdges(t *testing.T) {
 			sut: &elements.NodeList{
 				NodeList: &sbom.NodeList{
 					Nodes: []*sbom.Node{
-						{Id: "node1"}, {Id: "node2"},
+						{Id: node1}, {Id: node2},
 					},
 					Edges: []*sbom.Edge{
 						{
-							Type: 0,
+							Type: sbom.Edge_UNKNOWN,
 							From: "node3",
-							To:   []string{"node1"},
+							To:   []string{node1},
 						},
 					},
-					RootElements: []string{"node1"},
+					RootElements: []string{node1},
 				},
 			},
 			expected: &elements.NodeList{
 				NodeList: &sbom.NodeList{
 					Nodes: []*sbom.Node{
-						{Id: "node1"}, {Id: "node2"},
+						{Id: node1}, {Id: node2},
 					},
 					Edges:        []*sbom.Edge{},
-					RootElements: []string{"node1"},
+					RootElements: []string{node1},
 				},
 			},
 		},

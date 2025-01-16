@@ -24,7 +24,7 @@ type Node struct {
 }
 
 // ConvertToNative implements ref.Val.ConvertToNative.
-func (n Node) ConvertToNative(typeDesc reflect.Type) (any, error) {
+func (n *Node) ConvertToNative(typeDesc reflect.Type) (any, error) {
 	if reflect.TypeOf(n).AssignableTo(typeDesc) {
 		return n, nil
 	} else if reflect.TypeOf(n.Node).AssignableTo(typeDesc) {
@@ -35,7 +35,7 @@ func (n Node) ConvertToNative(typeDesc reflect.Type) (any, error) {
 }
 
 // ConvertToType implements ref.Val.ConvertToType.
-func (n Node) ConvertToType(typeVal ref.Type) ref.Val {
+func (n *Node) ConvertToType(typeVal ref.Type) ref.Val {
 	switch typeVal {
 	case NodeType:
 		return n
@@ -46,28 +46,29 @@ func (n Node) ConvertToType(typeVal ref.Type) ref.Val {
 }
 
 // Equal implements ref.Val.Equal.
-func (n Node) Equal(other ref.Val) ref.Val {
-	_, ok := other.(Node)
+func (n *Node) Equal(other ref.Val) ref.Val {
+	otherNode, ok := other.(*Node)
 	if !ok {
 		return types.MaybeNoSuchOverloadErr(other)
 	}
 
-	// TODO: Moar tests like:
-	// return types.Bool(d.URL.String() == otherDur.URL.String())
-	return types.True
+	if n.Node.Equal(otherNode.Node) {
+		return types.True
+	}
+	return types.False
 }
 
-func (n Node) Type() ref.Type {
+func (*Node) Type() ref.Type {
 	return NodeType
 }
 
 // Value implements ref.Val.Value.
-func (n Node) Value() any {
+func (n *Node) Value() any {
 	return n.Node
 }
 
 // ToNodeList returns a new NodeList with the node as the only member
-func (n Node) ToNodeList() *NodeList {
+func (n *Node) ToNodeList() *NodeList {
 	return &NodeList{
 		NodeList: &sbom.NodeList{
 			Nodes:        []*sbom.Node{n.Node},

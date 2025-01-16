@@ -24,7 +24,7 @@ type NodeList struct {
 }
 
 // ConvertToNative implements ref.Val.ConvertToNative.
-func (nl NodeList) ConvertToNative(typeDesc reflect.Type) (any, error) {
+func (nl *NodeList) ConvertToNative(typeDesc reflect.Type) (any, error) {
 	if reflect.TypeOf(nl).AssignableTo(typeDesc) {
 		return nl, nil
 	} else if reflect.TypeOf(nl.NodeList).AssignableTo(typeDesc) {
@@ -34,7 +34,7 @@ func (nl NodeList) ConvertToNative(typeDesc reflect.Type) (any, error) {
 }
 
 // ConvertToType implements ref.Val.ConvertToType.
-func (nl NodeList) ConvertToType(typeVal ref.Type) ref.Val {
+func (nl *NodeList) ConvertToType(typeVal ref.Type) ref.Val {
 	switch typeVal {
 	case NodeListType:
 		return nl
@@ -45,8 +45,8 @@ func (nl NodeList) ConvertToType(typeVal ref.Type) ref.Val {
 }
 
 // Equal implements ref.Val.Equal.
-func (nl NodeList) Equal(other ref.Val) ref.Val {
-	otherNodeList, ok := other.(NodeList)
+func (nl *NodeList) Equal(other ref.Val) ref.Val {
+	otherNodeList, ok := other.(*NodeList)
 	if !ok {
 		return types.MaybeNoSuchOverloadErr(other)
 	}
@@ -58,18 +58,18 @@ func (nl NodeList) Equal(other ref.Val) ref.Val {
 }
 
 // Type implements ref.Val.Type.
-func (nl NodeList) Type() ref.Type {
+func (*NodeList) Type() ref.Type {
 	return NodeListType
 }
 
 // Value implements ref.Val.Value.
-func (nl NodeList) Value() any {
+func (nl *NodeList) Value() any {
 	return nl.NodeList
 }
 
 // Add should at least merge two nodelists together.
-func (nl NodeList) Add(incoming ref.Val) {
-	newNodeList, ok := incoming.(NodeList)
+func (nl *NodeList) Add(incoming ref.Val) {
+	newNodeList, ok := incoming.(*NodeList)
 	if !ok {
 		// Here we should have a method to err
 		return
@@ -87,7 +87,7 @@ func (nl NodeList) Add(incoming ref.Val) {
 }
 
 // AddEsge adds edge data to
-func (nl NodeList) AddEdge(from string, t sbom.Edge_Type, to []string) {
+func (nl *NodeList) AddEdge(from string, t sbom.Edge_Type, to []string) {
 	for i := range nl.Edges {
 		// If there is already an edge with the same data, just add
 		if nl.Edges[i].From == from && nl.Edges[i].Type == t {
@@ -116,7 +116,7 @@ func (nl NodeList) AddEdge(from string, t sbom.Edge_Type, to []string) {
 }
 
 // HasNodeWithID Returns true if the NodeList already has a node with the specified ID
-func (nl NodeList) HasNodeWithID(nodeID string) bool {
+func (nl *NodeList) HasNodeWithID(nodeID string) bool {
 	for _, n := range nl.Nodes {
 		if n.Id == nodeID {
 			return true

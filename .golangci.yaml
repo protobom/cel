@@ -164,3 +164,15 @@ linters-settings:
     require-explanation: false
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
     require-specific: true
+  revive:
+    enable-all-rules: true
+    rules:
+      - name: add-constant
+        arguments:
+          - allowInts: "0"
+      - name: line-length-limit
+        disabled: true
+      - name: function-length
+        disabled: true
+      - name: cognitive-complexity
+        disabled: true

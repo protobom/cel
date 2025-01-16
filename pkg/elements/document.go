@@ -20,7 +20,7 @@ type Document struct {
 }
 
 // ConvertToNative implements ref.Val.ConvertToNative.
-func (d Document) ConvertToNative(typeDesc reflect.Type) (any, error) {
+func (d *Document) ConvertToNative(typeDesc reflect.Type) (any, error) {
 	if reflect.TypeOf(d).AssignableTo(typeDesc) {
 		return d, nil
 	} else if reflect.TypeOf(d.Document).AssignableTo(typeDesc) {
@@ -31,7 +31,7 @@ func (d Document) ConvertToNative(typeDesc reflect.Type) (any, error) {
 }
 
 // ConvertToType implements ref.Val.ConvertToType.
-func (d Document) ConvertToType(typeVal ref.Type) ref.Val {
+func (d *Document) ConvertToType(typeVal ref.Type) ref.Val {
 	switch typeVal {
 	case DocumentType:
 		return d
@@ -43,22 +43,17 @@ func (d Document) ConvertToType(typeVal ref.Type) ref.Val {
 }
 
 // Equal implements ref.Val.Equal.
-func (d Document) Equal(other ref.Val) ref.Val {
-	_, ok := other.(Document)
-	if !ok {
-		return types.MaybeNoSuchOverloadErr(other)
-	}
-
-	// TODO(puerco): Moar tests like:
-	// return types.Bool(d.URL.String() == otherDur.URL.String())
-	return types.True
+func (*Document) Equal(other ref.Val) ref.Val {
+	// This cannot be implemented yet until the protobom Document supports
+	// comparison
+	return types.MaybeNoSuchOverloadErr(other)
 }
 
-func (d Document) Type() ref.Type {
+func (*Document) Type() ref.Type {
 	return DocumentType
 }
 
 // Value implements ref.Val.Value.
-func (d Document) Value() any {
+func (d *Document) Value() any {
 	return d.Document
 }
