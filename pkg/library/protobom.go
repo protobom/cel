@@ -6,6 +6,8 @@
 package library
 
 import (
+	"slices"
+
 	"github.com/google/cel-go/cel"
 	"github.com/protobom/protobom/pkg/sbom"
 
@@ -52,12 +54,12 @@ func (*Protobom) TypeAdapters() []cel.EnvOption {
 // createEnvironment creates the CEL execution environment that the runner will
 // use to compile and evaluate programs on the SBOM
 func (p *Protobom) CompileOptions() []cel.EnvOption {
-	ret := []cel.EnvOption{}
-	ret = append(ret, p.Types()...)
-	ret = append(ret, p.Variables()...)
-	ret = append(ret, p.Functions()...)
-	ret = append(ret, p.TypeAdapters()...)
-	return ret
+	return slices.Concat(
+		p.Types(),
+		p.Variables(),
+		p.Functions(),
+		p.TypeAdapters(),
+	)
 }
 
 // ProgramOptions is here to implement the cel library interface, currently
