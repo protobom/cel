@@ -11,10 +11,10 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 )
 
-type RunnerImplementation interface {
+type Implementation interface {
 	ReadStream(io.Reader) (string, error)
 	Compile(*cel.Env, string) (*cel.Ast, error)
-	Evaluate(*cel.Env, *cel.Ast, *map[string]any) (ref.Val, error)
+	Evaluate(*cel.Env, *cel.Ast, map[string]any) (ref.Val, error)
 }
 
 type defaultRunnerImplementation struct{}
@@ -43,7 +43,7 @@ func (dri *defaultRunnerImplementation) Compile(env *cel.Env, code string) (*cel
 
 // EvaluateAST evaluates a CEL syntax tree on an SBOM. Returns the program
 // evaluation result or an error.
-func (dri *defaultRunnerImplementation) Evaluate(env *cel.Env, ast *cel.Ast, variables *map[string]any) (ref.Val, error) {
+func (dri *defaultRunnerImplementation) Evaluate(env *cel.Env, ast *cel.Ast, variables map[string]any) (ref.Val, error) {
 	program, err := env.Program(ast, cel.EvalOptions(cel.OptOptimize))
 	if err != nil {
 		return nil, fmt.Errorf("generating program from AST: %w", err)

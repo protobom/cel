@@ -19,14 +19,17 @@ var (
 	ProtobomType   = cel.ObjectType("protobom", traits.ReceiverType)
 )
 
+// Protobom is a global object that the CEL integration exposes in the environment
+// this object groups some of the SBOM utility functions that are not methods
+// of the protobom elements.
 type Protobom struct{}
 
-func (p Protobom) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
-	return nil, errors.New("a protobom object cannot be converted to native")
+func (*Protobom) ConvertToNative(reflect.Type) (interface{}, error) {
+	return nil, errors.New("protobom objects cannot be converted to native")
 }
 
 // ConvertToType implements ref.Val.ConvertToType.
-func (p *Protobom) ConvertToType(typeVal ref.Type) ref.Val {
+func (*Protobom) ConvertToType(typeVal ref.Type) ref.Val {
 	switch typeVal {
 	case types.TypeType:
 		return ProtobomType
@@ -36,11 +39,11 @@ func (p *Protobom) ConvertToType(typeVal ref.Type) ref.Val {
 }
 
 // Equal implements ref.Val.Equal.
-func (p *Protobom) Equal(other ref.Val) ref.Val {
-	return types.NewErr("protobom objects cannot be compared")
+func (*Protobom) Equal(ref.Val) ref.Val {
+	return types.True
 }
 
-func (p *Protobom) Type() ref.Type {
+func (*Protobom) Type() ref.Type {
 	return ProtobomType
 }
 

@@ -9,7 +9,6 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/ext"
-
 	"github.com/protobom/protobom/pkg/reader"
 	"github.com/protobom/protobom/pkg/sbom"
 
@@ -31,7 +30,7 @@ var defaultOptions = Options{
 
 type Runner struct {
 	Environment *cel.Env
-	impl        RunnerImplementation
+	impl        Implementation
 }
 
 func NewRunner() (*Runner, error) {
@@ -55,7 +54,7 @@ func NewRunnerWithOptions(opts *Options) (*Runner, error) {
 // variaables passed in `variables`. The function returns the raw ref.Val
 // meaning that any cel expression returning an error will not return err but
 // will set the err in the return value.
-func (r *Runner) Evaluate(code string, variables *map[string]any) (ref.Val, error) {
+func (r *Runner) Evaluate(code string, variables map[string]any) (ref.Val, error) {
 	ast, err := r.impl.Compile(r.Environment, code)
 	if err != nil {
 		return nil, fmt.Errorf("compilation error: %w", err)
@@ -95,15 +94,15 @@ type varBuilderOptions struct {
 	Documents []*sbom.Document
 }
 
-type varBuilderOption func(*varBuilderOptions)
+type VarBuilderOption func(*varBuilderOptions)
 
-func WithPaths(paths []string) varBuilderOption {
+func WithPaths(paths []string) VarBuilderOption {
 	return func(opts *varBuilderOptions) {
 		opts.Paths = paths
 	}
 }
 
-func WithDocuments(docs []*sbom.Document) varBuilderOption {
+func WithDocuments(docs []*sbom.Document) VarBuilderOption {
 	return func(opts *varBuilderOptions) {
 		opts.Documents = docs
 	}
@@ -118,7 +117,7 @@ func WithDocuments(docs []*sbom.Document) varBuilderOption {
 //	   WithPaths([]string{"sbom1.spdx.json", "sbom2.cdx.json"}),
 //	   WithDocuments(sbom.NewDocument())
 //	)
-func BuildVariables(optsFn ...varBuilderOption) (*map[string]any, error) {
+func BuildVariables(optsFn ...VarBuilderOption) (map[string]any, error) {
 	opts := &varBuilderOptions{}
 	for _, f := range optsFn {
 		f(opts)
@@ -146,7 +145,7 @@ func BuildVariables(optsFn ...varBuilderOption) (*map[string]any, error) {
 	}
 
 	// Add the SBOM list to the runtim environment
-	return &map[string]any{
+	return map[string]any{
 		"protobom": elements.Protobom{},
 		"sboms":    sbomList,
 	}, nil

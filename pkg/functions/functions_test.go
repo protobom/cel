@@ -9,9 +9,10 @@ import (
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"github.com/protobom/cel/pkg/elements"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/cel/pkg/elements"
 )
 
 // ToNodeList takes a node and returns a new NodeList
@@ -91,7 +92,9 @@ func TestNodeByID(t *testing.T) {
 			res := NodeByID(tc.sut, types.String("mynode"))
 			require.NotNil(t, res)
 			require.Equal(t, "elements.Node", fmt.Sprintf("%T", res), res)
-			require.Equal(t, "mynode", res.Value().(*sbom.Node).Id)
+			n, ok := res.Value().(*sbom.Node)
+			require.True(t, ok)
+			require.Equal(t, "mynode", n.Id)
 		})
 	}
 }

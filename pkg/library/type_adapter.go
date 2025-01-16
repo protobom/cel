@@ -16,8 +16,7 @@ func (TypeAdapter) NativeToValue(value interface{}) ref.Val {
 	val, ok := value.(elements.Protobom)
 	if ok {
 		return &val
-	} else {
-		// let the default adapter handle other cases
-		return types.DefaultTypeAdapter.NativeToValue(value)
 	}
+	// let the default adapter handle other cases
+	return types.DefaultTypeAdapter.NativeToValue(value)
 }

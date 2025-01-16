@@ -6,9 +6,10 @@ package functions
 import (
 	"testing"
 
-	"github.com/protobom/cel/pkg/elements"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/stretchr/testify/require"
+
+	"github.com/protobom/cel/pkg/elements"
 )
 
 func TestCleanEdges(t *testing.T) {

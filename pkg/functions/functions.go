@@ -11,11 +11,10 @@ import (
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"sigs.k8s.io/release-utils/version"
-
 	"github.com/protobom/protobom/pkg/reader"
 	"github.com/protobom/protobom/pkg/sbom"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"sigs.k8s.io/release-utils/version"
 
 	"github.com/protobom/cel/pkg/elements"
 )
@@ -51,13 +50,13 @@ var ToNodeList = func(lhs ref.Val) ref.Val {
 	}
 }
 
-var Addition = func(lhs, rhs ref.Val) ref.Val {
+var Addition = func(_, _ ref.Val) ref.Val {
 	return elements.NodeList{
 		NodeList: &sbom.NodeList{},
 	}
 }
 
-var AdditionOp = func(vals ...ref.Val) ref.Val {
+var AdditionOp = func(...ref.Val) ref.Val {
 	return elements.NodeList{
 		NodeList: &sbom.NodeList{},
 	}
@@ -268,7 +267,7 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	if !ok {
 		return types.NewErr("node id has to be a string")
 	}
-	// relType
+	// relType, this should be used below instead of Edge_dependsOn
 	_, ok = vals[3].Value().(string)
 	if !ok {
 		return types.NewErr("relationship type has has to be a string")
@@ -281,15 +280,15 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 
 	switch v := vals[0].Value().(type) {
 	case *sbom.Document:
-		// FIXME: Lookup reltype
-		if err := v.NodeList.RelateNodeListAtID(nodelist.Value().(*sbom.NodeList), id, sbom.Edge_dependsOn); err != nil {
+		// TODO(puerco): Lookup reltype we read from vals[3]
+		if err := v.NodeList.RelateNodeListAtID(nodelist.NodeList, id, sbom.Edge_dependsOn); err != nil {
 			return types.NewErr("relating nodelist: %w", err)
 		}
 		return elements.Document{
 			Document: v,
 		}
 	case *sbom.NodeList:
-		if err := v.RelateNodeListAtID(nodelist.Value().(*sbom.NodeList), id, sbom.Edge_dependsOn); err != nil {
+		if err := v.RelateNodeListAtID(nodelist.NodeList, id, sbom.Edge_dependsOn); err != nil {
 			return types.NewErr("relating nodelist: %w", err)
 		}
 		return elements.NodeList{

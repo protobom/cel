@@ -46,15 +46,15 @@ func (nl NodeList) ConvertToType(typeVal ref.Type) ref.Val {
 
 // Equal implements ref.Val.Equal.
 func (nl NodeList) Equal(other ref.Val) ref.Val {
-	// otherDur, ok := other.(NodeList)
-	_, ok := other.(NodeList)
+	otherNodeList, ok := other.(NodeList)
 	if !ok {
 		return types.MaybeNoSuchOverloadErr(other)
 	}
 
-	// TODO: Moar tests like:
-	// return types.Bool(d.URL.String() == otherDur.URL.String())
-	return types.True
+	if nl.NodeList.Equal(otherNodeList.NodeList) {
+		return types.True
+	}
+	return types.False
 }
 
 // Type implements ref.Val.Type.
@@ -67,18 +67,22 @@ func (nl NodeList) Value() interface{} {
 	return nl.NodeList
 }
 
+// Add should at least merge two nodelists together.
 func (nl NodeList) Add(incoming ref.Val) {
-	if newNodeList, ok := incoming.(NodeList); ok {
-		// return types.NewErr("attemtp to convert a non node")
-		for _, n := range newNodeList.Nodes {
-			if !nl.HasNodeWithID(n.Id) {
-				nl.Nodes = append(nl.Nodes, n)
-			}
-		}
+	newNodeList, ok := incoming.(NodeList)
+	if !ok {
+		// Here we should have a method to err
+		return
+	}
 
-		for _, e := range newNodeList.Edges {
-			nl.AddEdge(e.From, e.Type, e.To)
+	for _, n := range newNodeList.Nodes {
+		if !nl.HasNodeWithID(n.Id) {
+			nl.Nodes = append(nl.Nodes, n)
 		}
+	}
+
+	for _, e := range newNodeList.Edges {
+		nl.AddEdge(e.From, e.Type, e.To)
 	}
 }
 

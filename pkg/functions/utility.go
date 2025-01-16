@@ -4,9 +4,10 @@
 package functions
 
 import (
-	"github.com/protobom/cel/pkg/elements"
 	"github.com/protobom/protobom/pkg/sbom"
 	"github.com/sirupsen/logrus"
+
+	"github.com/protobom/cel/pkg/elements"
 )
 
 // cleanEdges removes all edges that have broken Froms and removes
