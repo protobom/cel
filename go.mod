@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/protobom/protobom v0.4.3
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	sigs.k8s.io/release-utils v0.8.2
 )
 
