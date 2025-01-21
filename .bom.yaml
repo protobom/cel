@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
+---
+license: Apache-2.0
+name: github.com/protobom/cel
+creator:
+ person: The Protobom Authors
+ tool: bom
+
+artifacts:
+  - type: directory
+    source: ../
+    license: Apache-2.0
+    gomodules: true

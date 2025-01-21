@@ -1,0 +1,2 @@
+// This query extracts all files from the SBOM and returns them in a new Document
+sboms[0].files().ToDocument()
