@@ -6,7 +6,7 @@ require (
 	github.com/protobom/protobom v0.5.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
-	sigs.k8s.io/release-utils v0.9.0
+	sigs.k8s.io/release-utils v0.10.0
 )
 
 require (
