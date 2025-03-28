@@ -29,7 +29,7 @@ var ToNodeList = func(lhs ref.Val) ref.Val {
 		}
 	case *elements.Document:
 		return &elements.NodeList{
-			NodeList: v.Document.NodeList,
+			NodeList: v.NodeList,
 		}
 	case *sbom.NodeList:
 		return &elements.NodeList{
@@ -125,7 +125,7 @@ func getTypedNodes(element ref.Val, t sbom.Node_NodeType) (elements.NodeList, er
 	case *sbom.Document:
 		sourceNodeList = v.NodeList
 	case *elements.Document:
-		sourceNodeList = v.Document.NodeList
+		sourceNodeList = v.NodeList
 	case *sbom.NodeList:
 		sourceNodeList = v
 	case *elements.NodeList:
@@ -219,7 +219,7 @@ var LoadSBOM = func(_, pathVal ref.Val) ref.Val {
 		return types.NewErr("argument to element by id has to be a string")
 	}
 
-	f, err := os.Open(path)
+	f, err := os.Open(path) //nolint:gosec // This is supposed to take user input
 	if err != nil {
 		return types.NewErr("opening SBOM file: %w", err)
 	}
