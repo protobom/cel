@@ -44,7 +44,6 @@ func TestToNodeList(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			res := ToNodeList(tc.sut)
 			require.NotNil(t, res)

@@ -116,6 +116,6 @@ func TestCleanEdges(t *testing.T) {
 		},
 	} {
 		cleanEdges(tc.sut)
-		require.Equal(t, tc.sut, tc.expected)
+		require.Equal(t, tc.expected, tc.sut)
 	}
 }
