@@ -16,6 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"sigs.k8s.io/release-utils/version"
 
+	"github.com/protobom/cel/pkg/adapter"
 	"github.com/protobom/cel/pkg/elements"
 )
 
@@ -294,5 +295,137 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 		}
 	default:
 		return types.NewErr("method unsupported on type %T", vals[0].Value())
+	}
+}
+
+// GetAuthors returns the document authors in a generic struct
+var GetAuthors = func(lhs ref.Val) ref.Val {
+	var md *sbom.Metadata
+	switch v := lhs.Value().(type) {
+	case *sbom.Metadata:
+		md = v
+	default:
+		return types.NewErr("method unsupported on type %T", lhs.Value())
+	}
+
+	reg, err := types.NewRegistry()
+	if err != nil {
+		return types.NewErrFromString(err.Error())
+	}
+
+	if md.GetAuthors() == nil {
+		return reg.NativeToValue([]*sbom.Person{})
+	}
+
+	return reg.NativeToValue(md.GetAuthors())
+}
+
+// DocumentAuthors returns the document authors in a generic struct
+var DocumentAuthors = func(lhs ref.Val) ref.Val {
+	var doc *sbom.Document
+	switch v := lhs.Value().(type) {
+	case *sbom.Document:
+		doc = v
+	case *elements.Document:
+		doc = v.Document
+	default:
+		return types.NewErr("method unsupported on type %T", lhs.Value())
+	}
+
+	reg, err := types.NewRegistry()
+	if err != nil {
+		return types.NewErrFromString(err.Error())
+	}
+
+	if doc.GetMetadata() == nil || doc.GetMetadata().GetAuthors() == nil {
+		return reg.NativeToValue([]*sbom.Person{})
+	}
+
+	return reg.NativeToValue(doc.GetMetadata().GetAuthors())
+}
+
+var GetNodeList = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.Document:
+		return &elements.NodeList{
+			NodeList: v.NodeList,
+		}
+	default:
+		return types.NewErr("argument to RootNodes only applies to Document")
+	}
+}
+
+var RootNodes = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.Document:
+		nl := &sbom.NodeList{}
+		nl.Nodes = v.GetNodeList().GetRootNodes()
+		return &elements.NodeList{
+			NodeList: nl,
+		}
+	case *sbom.NodeList:
+		l := []ref.Val{}
+		for _, n := range v.GetRootNodes() {
+			l = append(l, &elements.Node{
+				Node: n,
+			})
+		}
+		return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
+	default:
+		return types.NewErr("argument to RootNodes only applies to Document and NodeList")
+	}
+}
+
+// GetNodes returns the list of nodes of the nodelist
+var NodeListGetNodes = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.NodeList:
+		l := []ref.Val{}
+		for _, n := range v.Nodes {
+			l = append(l, &elements.Node{
+				Node: n,
+			})
+		}
+		return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
+	default:
+		return types.NewErr("argument to RootNodes only applies to NodeList")
+	}
+}
+
+// NodeGetSuppliers returns the list of nodes of the nodelist
+var NodeGetSuppliers = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.Node:
+		reg, err := types.NewRegistry()
+		if err != nil {
+			return types.NewErrFromString(err.Error())
+		}
+
+		if v.GetSuppliers() == nil {
+			return reg.NativeToValue([]*sbom.Person{})
+		}
+
+		return reg.NativeToValue(v.GetSuppliers())
+	default:
+		return types.NewErr("GetSuppliers only applies to Node")
+	}
+}
+
+// NodeGetSuppliers returns the list of nodes of the nodelist
+var NodeGetOriginators = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.Node:
+		reg, err := types.NewRegistry()
+		if err != nil {
+			return types.NewErrFromString(err.Error())
+		}
+
+		if v.GetOriginators() == nil {
+			return reg.NativeToValue([]*sbom.Person{})
+		}
+
+		return reg.NativeToValue(v.GetOriginators())
+	default:
+		return types.NewErr("GetOriginators only applies to Node")
 	}
 }

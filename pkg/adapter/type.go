@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: Copyright 2025 The Protobom Authors
 
-package library
+package adapter
 
 import (
 	"github.com/google/cel-go/common/types"
@@ -14,11 +14,11 @@ import (
 // The Protobom TypeAdapter converts native protobom elements resulting from
 // the graph API operations or evaluations into their CEL-friendly wrappers
 // that implenent ref.Val
-type TypeAdapter struct{}
+type ProtobomTypeAdapter struct{}
 
 // NativeToValue converts from the native protobom elements to their elements.*
 // wrappers so that they can be handled in the CEL environment.
-func (TypeAdapter) NativeToValue(value any) ref.Val {
+func (ProtobomTypeAdapter) NativeToValue(value any) ref.Val {
 	switch v := value.(type) {
 	case elements.Protobom:
 		return &v
@@ -29,6 +29,8 @@ func (TypeAdapter) NativeToValue(value any) ref.Val {
 		return &elements.NodeList{NodeList: &v}
 	case sbom.Node:
 		return &elements.Node{Node: &v}
+	case sbom.Person:
+		return &elements.Person{Person: &v}
 	// Pointers:
 	case *sbom.Document:
 		return &elements.Document{Document: v}
@@ -36,6 +38,8 @@ func (TypeAdapter) NativeToValue(value any) ref.Val {
 		return &elements.NodeList{NodeList: v}
 	case *sbom.Node:
 		return &elements.Node{Node: v}
+	case *sbom.Person:
+		return &elements.Person{Person: v}
 	}
 
 	// let the default adapter handle other cases

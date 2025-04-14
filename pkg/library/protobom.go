@@ -11,6 +11,7 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/protobom/protobom/pkg/sbom"
 
+	"github.com/protobom/cel/pkg/adapter"
 	"github.com/protobom/cel/pkg/elements"
 )
 
@@ -26,11 +27,21 @@ func NewProtobom() *Protobom {
 
 // Types returns the types that the library defines in the CEL environment
 func (*Protobom) Types() []cel.EnvOption {
+	// Extract the protobom descriptor to pass to the engine
+	messageType := (&sbom.Document{}).ProtoReflect().Type()
+	descriptor := messageType.Descriptor().ParentFile()
+
 	return []cel.EnvOption{
+		cel.TypeDescs(
+			descriptor,
+		),
 		cel.Types(elements.DocumentType),
+		cel.Types(elements.PersonType),
 		cel.Types(&sbom.Document{}),
 		cel.Types(&sbom.NodeList{}),
 		cel.Types(&sbom.Node{}),
+		cel.Types(&sbom.Person{}),
+		cel.Types(&sbom.Metadata{}),
 	}
 }
 
@@ -39,6 +50,7 @@ func (*Protobom) Types() []cel.EnvOption {
 func (*Protobom) Variables() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Variable("sboms", cel.MapType(cel.IntType, elements.DocumentType)),
+		cel.Variable("docs", cel.MapType(cel.IntType, cel.DynType)),
 		cel.Variable("protobom", elements.ProtobomType),
 	}
 }
@@ -47,11 +59,11 @@ func (*Protobom) Variables() []cel.EnvOption {
 // that can be injected into the CEL environment
 func (*Protobom) TypeAdapters() []cel.EnvOption {
 	return []cel.EnvOption{
-		cel.CustomTypeAdapter(&TypeAdapter{}),
+		cel.CustomTypeAdapter(&adapter.ProtobomTypeAdapter{}),
 	}
 }
 
-// createEnvironment creates the CEL execution environment that the runner will
+// CompileOptions creates the CEL execution environment that the runner will
 // use to compile and evaluate programs on the SBOM
 func (p *Protobom) CompileOptions() []cel.EnvOption {
 	return slices.Concat(
