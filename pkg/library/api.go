@@ -16,7 +16,7 @@ import (
 func (*Protobom) Functions() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Function(
-			"files",
+			"get_files",
 			cel.MemberOverload(
 				"sbom_files_binding", []*types.Type{elements.DocumentType}, elements.NodeListType,
 				cel.UnaryBinding(functions.Files),
@@ -32,7 +32,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		),
 
 		cel.Function(
-			"packages",
+			"get_packages",
 			cel.MemberOverload(
 				"sbom_packages_binding", []*cel.Type{elements.DocumentType}, elements.NodeListType,
 				cel.UnaryBinding(functions.Packages),
@@ -59,7 +59,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		),
 
 		cel.Function(
-			"ToNodeList",
+			"to_node_list",
 			cel.MemberOverload(
 				"document_tonodelist_binding",
 				[]*cel.Type{elements.DocumentType}, elements.NodeListType,
@@ -80,7 +80,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		// NodeByID returns a node looking it up by its identifier
 		// Overloaded in: Document and NodeList.
 		cel.Function(
-			"NodeByID",
+			"get_node_by_id",
 			cel.MemberOverload(
 				"sbom_nodebyid_binding", []*cel.Type{elements.DocumentType, cel.StringType}, elements.NodeType,
 				cel.BinaryBinding(functions.NodeByID),
@@ -95,7 +95,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		// package URL of a certain type.
 		// Overloaded in: Document and NodeList.
 		cel.Function(
-			"NodesByPurlType",
+			"get_nodes_by_purl_type",
 			cel.MemberOverload(
 				"sbom_nodesbypurltype_binding", []*cel.Type{elements.DocumentType, cel.StringType}, elements.NodeListType,
 				cel.BinaryBinding(functions.NodesByPurlType),
@@ -160,7 +160,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		// ToDocument wraps an element and returns a new Document
 		// Overloaded in: Node NodeList and Document (noop)
 		cel.Function(
-			"ToDocument",
+			"to_document",
 			cel.MemberOverload(
 				"document_todocument_binding",
 				[]*cel.Type{elements.DocumentType}, elements.DocumentType,
@@ -179,7 +179,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		),
 
 		cel.Function(
-			"LoadSBOM",
+			"load_sbom",
 			cel.MemberOverload(
 				"protobom_loadsbom_binding",
 				[]*cel.Type{elements.ProtobomType, cel.StringType}, elements.DocumentType,
@@ -188,7 +188,7 @@ func (*Protobom) Functions() []cel.EnvOption {
 		),
 
 		cel.Function(
-			"RelateNodeListAtID",
+			"relate_node_list_at_id",
 			cel.MemberOverload(
 				"sbom_relatenodesatid_binding",
 				[]*cel.Type{elements.DocumentType, elements.NodeListType, cel.StringType, cel.StringType},

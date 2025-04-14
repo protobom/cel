@@ -10,6 +10,7 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types/traits"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -56,4 +57,23 @@ func (*Document) Type() ref.Type {
 // Value implements ref.Val.Value.
 func (d *Document) Value() any {
 	return d.Document
+}
+
+var _ traits.Indexer = (*Document)(nil)
+
+func (d *Document) Get(index ref.Val) ref.Val {
+	switch v := index.Value().(type) {
+	case string:
+		switch v {
+		case "nodelist":
+			return &NodeList{
+				NodeList: d.NodeList,
+			}
+		default:
+			return types.NewErr("no such key %v", index)
+		}
+
+	default:
+		return types.NewErr("no such key %v", index)
+	}
 }
