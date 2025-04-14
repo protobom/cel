@@ -11,6 +11,7 @@ import (
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types/traits"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -123,4 +124,27 @@ func (nl *NodeList) HasNodeWithID(nodeID string) bool {
 		}
 	}
 	return false
+}
+
+// We implement the indexer trait, slowly these types should implement more:
+// // https://pkg.go.dev/github.com/google/cel-go/common/types/traits
+var _ traits.Indexer = (*NodeList)(nil)
+
+func (nl *NodeList) Get(index ref.Val) ref.Val {
+	switch v := index.Value().(type) {
+	case string:
+		if v == "nodes" {
+			nodesList := make([]ref.Val, len(v))
+			for i, node := range nl.Nodes {
+				n := Node{
+					Node: node,
+				}
+				nodesList[i] = n.ConvertToType(NodeType)
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, nodesList)
+		}
+		return types.NewErr("no such key %v", index)
+	default:
+		return types.NewErr("no such key %v", index)
+	}
 }

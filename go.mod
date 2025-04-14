@@ -1,9 +1,9 @@
 module github.com/protobom/cel
 
 go 1.23.4
+
 require (
 	github.com/protobom/protobom v0.5.2
-	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	sigs.k8s.io/release-utils v0.11.1
 )
@@ -12,6 +12,7 @@ require (
 	cel.dev/expr v0.19.1 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cobra v1.9.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

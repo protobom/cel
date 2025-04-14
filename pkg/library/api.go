@@ -106,6 +106,57 @@ func (*Protobom) Functions() []cel.EnvOption {
 			),
 		),
 
+		// NodesByPurlType returns a NodeList including all nodes that have a
+		// package URL of a certain type.
+		// Overloaded in: Document and NodeList.
+		cel.Function(
+			"get_root_nodes",
+			cel.MemberOverload(
+				"doc_rootnodes_binding", []*cel.Type{elements.DocumentType}, cel.ListType(cel.DynType),
+				cel.UnaryBinding(functions.RootNodes),
+			),
+			cel.MemberOverload(
+				"nodelist_rootnodes_binding", []*cel.Type{elements.NodeListType}, cel.ListType(cel.DynType),
+				cel.UnaryBinding(functions.RootNodes),
+			),
+		),
+
+		// get_suppliers returns the list of persons acting as suppliers in the node
+		cel.Function(
+			"get_suppliers",
+			cel.MemberOverload(
+				"node_getsuppliers_binding", []*cel.Type{elements.NodeType}, types.ListType,
+				cel.UnaryBinding(functions.NodeGetSuppliers),
+			),
+		),
+
+		// get_suppliers returns the list of persons acting as suppliers in the node
+		cel.Function(
+			"get_originators",
+			cel.MemberOverload(
+				"node_getoriginators_binding", []*cel.Type{elements.NodeType}, types.ListType,
+				cel.UnaryBinding(functions.NodeGetOriginators),
+			),
+		),
+
+		// Overloaded in: Document and NodeList.
+		cel.Function(
+			"get_nodes",
+			cel.MemberOverload(
+				"enodelist_get_nodes", []*cel.Type{cel.ObjectType("protobom.protobom.NodeList")}, types.NewListType(types.DynType),
+				cel.UnaryBinding(functions.NodeListGetNodes),
+			),
+		),
+
+		// GetNodeList returns a document's NodeList
+		cel.Function(
+			"get_node_list",
+			cel.MemberOverload(
+				"sbom_getnode_list_binding", []*cel.Type{elements.DocumentType}, elements.NodeListType,
+				cel.UnaryBinding(functions.GetNodeList),
+			),
+		),
+
 		// ToDocument wraps an element and returns a new Document
 		// Overloaded in: Node NodeList and Document (noop)
 		cel.Function(
@@ -149,6 +200,21 @@ func (*Protobom) Functions() []cel.EnvOption {
 				[]*cel.Type{elements.NodeListType, elements.NodeListType, cel.StringType, cel.StringType},
 				elements.DocumentType, // result
 				cel.FunctionBinding(functions.RelateNodeListAtID),
+			),
+		),
+		cel.Function(
+			"get_authors",
+			cel.MemberOverload(
+				"sbom_authors",
+				[]*cel.Type{elements.DocumentType},
+				types.ListType, // result
+				cel.UnaryBinding(functions.DocumentAuthors),
+			),
+			cel.MemberOverload(
+				"sbom_authors_metadata",
+				[]*cel.Type{cel.ObjectType("protobom.protobom.Metadata")},
+				types.ListType, // result
+				cel.UnaryBinding(functions.DocumentAuthors),
 			),
 		),
 	}

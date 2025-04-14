@@ -5,7 +5,6 @@ package functions
 
 import (
 	"github.com/protobom/protobom/pkg/sbom"
-	"github.com/sirupsen/logrus"
 
 	"github.com/protobom/cel/pkg/elements"
 )
@@ -66,7 +65,6 @@ func reconnectOrphanNodes(nl *elements.NodeList) {
 		if _, ok := edgeIndex[n.Id]; !ok {
 			if _, ok := rootIndex[n.Id]; !ok {
 				nl.RootElements = append(nl.RootElements, n.Id)
-				logrus.Infof("Added orphan node %s", n.Id)
 			}
 		}
 	}

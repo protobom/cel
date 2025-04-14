@@ -11,6 +11,7 @@ import (
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types/traits"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -75,5 +76,39 @@ func (n *Node) ToNodeList() *NodeList {
 			Edges:        []*sbom.Edge{},
 			RootElements: []string{n.Id},
 		},
+	}
+}
+
+var _ traits.Indexer = (*Node)(nil)
+
+func (n *Node) Get(index ref.Val) ref.Val {
+	switch v := index.Value().(type) {
+	case string:
+		switch v {
+		case "suppliers":
+			personsList := []ref.Val{}
+			for _, person := range n.Suppliers {
+				p := &Person{
+					Person: person,
+				}
+				personsList = append(personsList, p)
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, personsList)
+
+		case "originators":
+			personsList := []ref.Val{}
+			for _, person := range n.Originators {
+				p := &Person{
+					Person: person,
+				}
+				personsList = append(personsList, p)
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, personsList)
+
+		default:
+			return types.NewErr("no such key %v", index)
+		}
+	default:
+		return types.NewErr("no such key %v", index)
 	}
 }
