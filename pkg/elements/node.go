@@ -85,6 +85,12 @@ func (n *Node) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
 		switch v {
+		case "version":
+			return types.String(n.Version)
+
+		case "identifiers":
+			return types.NewDynamicMap(types.DefaultTypeAdapter, n.Identifiers)
+
 		case "suppliers":
 			personsList := []ref.Val{}
 			for _, person := range n.Suppliers {
