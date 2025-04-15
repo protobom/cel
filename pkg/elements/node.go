@@ -81,16 +81,43 @@ func (n *Node) ToNodeList() *NodeList {
 
 var _ traits.Indexer = (*Node)(nil)
 
+//nolint:gocyclo
 func (n *Node) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
 		switch v {
+		case "id":
+			return types.String(n.Id)
+		case "name":
+			return types.String(n.Name)
+		case "type":
+			return types.String(n.Node.Type.String())
 		case "version":
 			return types.String(n.Version)
-
-		case "identifiers":
-			return types.NewDynamicMap(types.DefaultTypeAdapter, n.Identifiers)
-
+		case "file_name":
+			return types.String(n.FileName)
+		case "url_home":
+			return types.String(n.UrlHome)
+		case "url_download":
+			return types.String(n.UrlDownload)
+		case "licenses":
+			return types.NewDynamicList(types.DefaultTypeAdapter, n.Licenses)
+		case "license_concluded":
+			return types.String(n.LicenseConcluded)
+		case "license_comments":
+			return types.String(n.LicenseComments)
+		case "copyright":
+			return types.String(n.Copyright)
+		case "source_info":
+			return types.String(n.SourceInfo)
+		case "comment":
+			return types.String(n.Comment)
+		case "summary":
+			return types.String(n.Summary)
+		case "description":
+			return types.String(n.Description)
+		case "attribution":
+			return types.NewDynamicList(types.DefaultTypeAdapter, n.Attribution)
 		case "suppliers":
 			personsList := []ref.Val{}
 			for _, person := range n.Suppliers {
@@ -110,7 +137,44 @@ func (n *Node) Get(index ref.Val) ref.Val {
 				personsList = append(personsList, p)
 			}
 			return types.NewRefValList(types.DefaultTypeAdapter, personsList)
-
+		case "release_date":
+			return types.Timestamp{Time: n.ReleaseDate.AsTime()}
+		case "build_date":
+			return types.Timestamp{Time: n.BuildDate.AsTime()}
+		case "valid_until_date":
+			return types.Timestamp{Time: n.ValidUntilDate.AsTime()}
+		case "external_references":
+			return types.NewDynamicList(types.DefaultTypeAdapter, n.ExternalReferences)
+		case "file_types":
+			return types.NewDynamicList(types.DefaultTypeAdapter, n.FileTypes)
+		case "identifiers":
+			ret := map[string]string{}
+			for t, v := range n.Identifiers {
+				if _, ok := sbom.SoftwareIdentifierType_name[t]; ok {
+					ret[sbom.SoftwareIdentifierType_name[t]] = v
+				} else {
+					ret[sbom.SoftwareIdentifierType_name[0]] = v
+				}
+			}
+			return types.NewDynamicMap(types.DefaultTypeAdapter, ret)
+		case "hashes":
+			ret := map[string]string{}
+			for a, v := range n.Hashes {
+				if _, ok := sbom.HashAlgorithm_name[a]; ok {
+					ret[sbom.HashAlgorithm_name[a]] = v
+				} else {
+					ret[sbom.HashAlgorithm_name[0]] = v
+				}
+			}
+			return types.NewDynamicMap(types.DefaultTypeAdapter, ret)
+		case "primary_purpose":
+			ret := []string{}
+			for _, p := range n.PrimaryPurpose {
+				ret = append(ret, p.String())
+			}
+			return types.NewDynamicList(types.DefaultTypeAdapter, ret)
+		case "properties":
+			return types.NewDynamicList(types.DefaultTypeAdapter, n.Properties)
 		default:
 			return types.NewErr("no such key %v", index)
 		}

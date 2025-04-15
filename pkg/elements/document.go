@@ -61,13 +61,18 @@ func (d *Document) Value() any {
 
 var _ traits.Indexer = (*Document)(nil)
 
+// Get is the getter to implement the indexer trait
 func (d *Document) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
 		switch v {
-		case "nodelist":
+		case "node_list":
 			return &NodeList{
 				NodeList: d.NodeList,
+			}
+		case "metadata":
+			return &Metadata{
+				Metadata: d.Metadata,
 			}
 		default:
 			return types.NewErr("no such key %v", index)

@@ -298,36 +298,16 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	}
 }
 
-// GetAuthors returns the document authors in a generic struct
-var GetAuthors = func(lhs ref.Val) ref.Val {
-	var md *sbom.Metadata
-	switch v := lhs.Value().(type) {
-	case *sbom.Metadata:
-		md = v
-	default:
-		return types.NewErr("method unsupported on type %T", lhs.Value())
-	}
-
-	reg, err := types.NewRegistry()
-	if err != nil {
-		return types.NewErrFromString(err.Error())
-	}
-
-	if md.GetAuthors() == nil {
-		return reg.NativeToValue([]*sbom.Person{})
-	}
-
-	return reg.NativeToValue(md.GetAuthors())
-}
-
 // DocumentAuthors returns the document authors in a generic struct
 var DocumentAuthors = func(lhs ref.Val) ref.Val {
-	var doc *sbom.Document
+	var metadata *sbom.Metadata
 	switch v := lhs.Value().(type) {
 	case *sbom.Document:
-		doc = v
+		metadata = v.GetMetadata()
 	case *elements.Document:
-		doc = v.Document
+		metadata = v.GetMetadata()
+	case *sbom.Metadata:
+		metadata = v
 	default:
 		return types.NewErr("method unsupported on type %T", lhs.Value())
 	}
@@ -337,11 +317,15 @@ var DocumentAuthors = func(lhs ref.Val) ref.Val {
 		return types.NewErrFromString(err.Error())
 	}
 
-	if doc.GetMetadata() == nil || doc.GetMetadata().GetAuthors() == nil {
+	if metadata == nil {
 		return reg.NativeToValue([]*sbom.Person{})
 	}
 
-	return reg.NativeToValue(doc.GetMetadata().GetAuthors())
+	if metadata.GetAuthors() == nil {
+		return reg.NativeToValue([]*sbom.Person{})
+	}
+
+	return reg.NativeToValue(metadata.GetAuthors())
 }
 
 var GetNodeList = func(lhs ref.Val) ref.Val {
@@ -351,7 +335,18 @@ var GetNodeList = func(lhs ref.Val) ref.Val {
 			NodeList: v.NodeList,
 		}
 	default:
-		return types.NewErr("argument to RootNodes only applies to Document")
+		return types.NewErr("invalid binding for get_node_list")
+	}
+}
+
+var GetMetadata = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.Document:
+		return &elements.Metadata{
+			Metadata: v.Metadata,
+		}
+	default:
+		return types.NewErr("invalid binding for get_metadata")
 	}
 }
 

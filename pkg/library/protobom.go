@@ -36,6 +36,7 @@ func (*Protobom) Types() []cel.EnvOption {
 			descriptor,
 		),
 		cel.Types(elements.DocumentType),
+		cel.Types(elements.MetadataType),
 		cel.Types(elements.PersonType),
 		cel.Types(&sbom.Document{}),
 		cel.Types(&sbom.NodeList{}),
