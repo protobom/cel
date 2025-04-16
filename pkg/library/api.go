@@ -152,8 +152,17 @@ func (*Protobom) Functions() []cel.EnvOption {
 		cel.Function(
 			"get_node_list",
 			cel.MemberOverload(
-				"sbom_getnode_list_binding", []*cel.Type{elements.DocumentType}, elements.NodeListType,
+				"sbom_get_node_list_binding", []*cel.Type{elements.DocumentType}, elements.NodeListType,
 				cel.UnaryBinding(functions.GetNodeList),
+			),
+		),
+
+		// GetMetadata returns a document's Metadata
+		cel.Function(
+			"get_metadata",
+			cel.MemberOverload(
+				"sbom_get_metadata_binding", []*cel.Type{elements.DocumentType}, elements.MetadataType,
+				cel.UnaryBinding(functions.GetMetadata),
 			),
 		),
 
@@ -205,14 +214,14 @@ func (*Protobom) Functions() []cel.EnvOption {
 		cel.Function(
 			"get_authors",
 			cel.MemberOverload(
-				"sbom_authors",
+				"sbom_get_authors",
 				[]*cel.Type{elements.DocumentType},
 				types.ListType, // result
 				cel.UnaryBinding(functions.DocumentAuthors),
 			),
 			cel.MemberOverload(
-				"sbom_authors_metadata",
-				[]*cel.Type{cel.ObjectType("protobom.protobom.Metadata")},
+				"metadata_get_authors",
+				[]*cel.Type{elements.MetadataType},
 				types.ListType, // result
 				cel.UnaryBinding(functions.DocumentAuthors),
 			),
