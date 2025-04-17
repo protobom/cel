@@ -143,8 +143,16 @@ func (*Protobom) Functions() []cel.EnvOption {
 		cel.Function(
 			"get_nodes",
 			cel.MemberOverload(
-				"enodelist_get_nodes", []*cel.Type{cel.ObjectType("protobom.protobom.NodeList")}, types.NewListType(types.DynType),
-				cel.UnaryBinding(functions.NodeListGetNodes),
+				"enodelist_get_nodes", []*cel.Type{elements.NodeListType}, types.NewListType(types.DynType),
+				cel.UnaryBinding(functions.GetNodes),
+			),
+		),
+
+		cel.Function(
+			"get_edges",
+			cel.MemberOverload(
+				"enodelist_get_edges", []*cel.Type{elements.NodeListType}, types.NewListType(elements.EdgeType),
+				cel.UnaryBinding(functions.GetEdges),
 			),
 		),
 
@@ -217,13 +225,13 @@ func (*Protobom) Functions() []cel.EnvOption {
 				"sbom_get_authors",
 				[]*cel.Type{elements.DocumentType},
 				types.ListType, // result
-				cel.UnaryBinding(functions.DocumentAuthors),
+				cel.UnaryBinding(functions.GetAuthors),
 			),
 			cel.MemberOverload(
 				"metadata_get_authors",
 				[]*cel.Type{elements.MetadataType},
 				types.ListType, // result
-				cel.UnaryBinding(functions.DocumentAuthors),
+				cel.UnaryBinding(functions.GetAuthors),
 			),
 		),
 	}
