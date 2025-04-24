@@ -234,5 +234,24 @@ func (*Protobom) Functions() []cel.EnvOption {
 				cel.UnaryBinding(functions.GetAuthors),
 			),
 		),
+		// NodeList API functions
+		cel.Function(
+			"get_nodes_by_name",
+			cel.MemberOverload(
+				"nodelist_nodes_by_name",
+				[]*cel.Type{elements.NodeListType, types.StringType}, // args
+				types.ListType, // result
+				cel.BinaryBinding(functions.GetNodesByName), // handler
+			),
+		),
+		cel.Function(
+			"get_node_descendants",
+			cel.MemberOverload(
+				"nodelist_node_descendants",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType}, // args
+				elements.NodeListType,                                               // result
+				cel.FunctionBinding(functions.NodeDescendants),                      // handler
+			),
+		),
 	}
 }

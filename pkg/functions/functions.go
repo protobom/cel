@@ -236,27 +236,6 @@ var LoadSBOM = func(_, pathVal ref.Val) ref.Val {
 	}
 }
 
-var NodesByPurlType = func(lhs, rhs ref.Val) ref.Val {
-	purlType, ok := rhs.Value().(string)
-	if !ok {
-		return types.NewErr("argument to GetNodesByPurlType must be a string")
-	}
-
-	var nl *sbom.NodeList
-	switch v := lhs.Value().(type) {
-	case *sbom.Document:
-		nl = v.NodeList.GetNodesByPurlType(purlType)
-	case *sbom.NodeList:
-		nl = v.GetNodesByPurlType(purlType)
-	default:
-		return types.NewErr("method unsupported on type %T", lhs.Value())
-	}
-
-	return &elements.NodeList{
-		NodeList: nl,
-	}
-}
-
 // RelateNodeListAtID relates a nodelist at the specified ID
 var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	if len(vals) != 4 {
