@@ -13,8 +13,8 @@ import (
 
 // Functions returns the compile-time options that define the functions that
 // the protobom library exposes to the cel environment.
-func (*Protobom) Functions() []cel.EnvOption {
-	return []cel.EnvOption{
+func (p *Protobom) Functions() []cel.EnvOption {
+	envopt := []cel.EnvOption{
 		cel.Function(
 			"get_files",
 			cel.MemberOverload(
@@ -196,15 +196,6 @@ func (*Protobom) Functions() []cel.EnvOption {
 		),
 
 		cel.Function(
-			"load_sbom",
-			cel.MemberOverload(
-				"protobom_loadsbom_binding",
-				[]*cel.Type{elements.ProtobomType, cel.StringType}, elements.DocumentType,
-				cel.BinaryBinding(functions.LoadSBOM),
-			),
-		),
-
-		cel.Function(
 			"relate_node_list_at_id",
 			cel.MemberOverload(
 				"sbom_relatenodesatid_binding",
@@ -254,4 +245,22 @@ func (*Protobom) Functions() []cel.EnvOption {
 			),
 		),
 	}
+
+	// Here we add all the functions that trigger I/O calls on the host system
+	// only if the option is enables. Most apps will not need them so we don't
+	// load them by default.
+	if p.Options.EnableIO {
+		envopt = append(
+			envopt,
+			cel.Function(
+				"load_sbom",
+				cel.MemberOverload(
+					"protobom_loadsbom_binding",
+					[]*cel.Type{elements.ProtobomType, cel.StringType}, elements.DocumentType,
+					cel.BinaryBinding(functions.LoadSBOM),
+				),
+			),
+		)
+	}
+	return envopt
 }
