@@ -58,14 +58,14 @@ func (e *Edge) Value() any {
 	return e.Edge
 }
 
-var _ traits.Indexer = (*Document)(nil)
+var _ traits.Indexer = (*Edge)(nil)
 
 // Get is the getter to implement the indexer trait
 func (e *Edge) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
 		switch v {
-		case "type":
+		case propType:
 			if _, ok := sbom.Edge_Type_name[int32(e.GetType())]; ok {
 				return types.String(sbom.Edge_Type_name[int32(e.GetType())])
 			}

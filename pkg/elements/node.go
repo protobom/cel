@@ -88,11 +88,11 @@ func (n *Node) Get(index ref.Val) ref.Val {
 		switch v {
 		case "id":
 			return types.String(n.Id)
-		case "name":
+		case propName:
 			return types.String(n.Name)
-		case "type":
+		case propType:
 			return types.String(n.Node.Type.String())
-		case "version":
+		case propVersion:
 			return types.String(n.Version)
 		case "file_name":
 			return types.String(n.FileName)
@@ -110,7 +110,7 @@ func (n *Node) Get(index ref.Val) ref.Val {
 			return types.String(n.Copyright)
 		case "source_info":
 			return types.String(n.SourceInfo)
-		case "comment":
+		case propComment:
 			return types.String(n.Comment)
 		case "summary":
 			return types.String(n.Summary)
@@ -157,7 +157,7 @@ func (n *Node) Get(index ref.Val) ref.Val {
 				}
 			}
 			return types.NewDynamicMap(types.DefaultTypeAdapter, ret)
-		case "hashes":
+		case propHashes:
 			ret := map[string]string{}
 			for a, v := range n.Hashes {
 				if _, ok := sbom.HashAlgorithm_name[a]; ok {

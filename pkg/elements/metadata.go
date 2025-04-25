@@ -67,15 +67,15 @@ func (md *Metadata) Get(index ref.Val) ref.Val {
 		switch v {
 		case "id":
 			return types.String(md.Id)
-		case "name":
+		case propName:
 			return types.String(md.Name)
-		case "version":
+		case propVersion:
 			return types.String(md.Version)
 		case "tools":
 			return types.NewDynamicList(types.DefaultTypeAdapter, md.Tools)
 		case "date":
 			return types.Timestamp{Time: md.Date.AsTime()}
-		case "comment":
+		case propComment:
 			return types.String(md.Comment)
 		default:
 			return types.NewErr("no such key %v", index)

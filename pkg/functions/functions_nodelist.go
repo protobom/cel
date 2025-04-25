@@ -6,9 +6,10 @@ package functions
 import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/protobom/protobom/pkg/sbom"
+
 	"github.com/protobom/cel/pkg/adapter"
 	"github.com/protobom/cel/pkg/elements"
-	"github.com/protobom/protobom/pkg/sbom"
 )
 
 func NodeDescendants(vals ...ref.Val) ref.Val {

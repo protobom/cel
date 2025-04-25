@@ -64,18 +64,18 @@ func (er *ExternalReference) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
 		switch v {
-		case "type":
+		case propType:
 			if _, ok := sbom.Edge_Type_name[int32(er.GetType())]; ok {
 				return types.String(sbom.ExternalReference_ExternalReferenceType_name[int32(er.GetType())])
 			}
 			return types.String(sbom.ExternalReference_ExternalReferenceType_name[0])
 		case "url":
 			return types.String(er.Url)
-		case "comment":
+		case propComment:
 			return types.String(er.Comment)
 		case "authority":
 			return types.String(er.Authority)
-		case "hashes":
+		case propHashes:
 			ret := map[string]string{}
 			for a, v := range er.Hashes {
 				if _, ok := sbom.HashAlgorithm_name[a]; ok {
