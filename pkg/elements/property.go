@@ -63,7 +63,7 @@ func (p *Property) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
 		switch v {
-		case "name":
+		case propName:
 			return types.String(p.Name)
 		case "data":
 			return types.String(p.Data)
