@@ -36,13 +36,25 @@ func (*Protobom) Types() []cel.EnvOption {
 			descriptor,
 		),
 		cel.Types(elements.DocumentType),
+		cel.Types(elements.EdgeType),
+		cel.Types(elements.ExternalReferenceType),
 		cel.Types(elements.MetadataType),
+		cel.Types(elements.NodeType),
+		cel.Types(elements.NodeListType),
 		cel.Types(elements.PersonType),
+		cel.Types(elements.PropertyType),
+		cel.Types(elements.SourceDataType),
+		cel.Types(elements.ToolType),
 		cel.Types(&sbom.Document{}),
-		cel.Types(&sbom.NodeList{}),
-		cel.Types(&sbom.Node{}),
-		cel.Types(&sbom.Person{}),
+		cel.Types(&sbom.Edge{}),
+		cel.Types(&sbom.ExternalReference{}),
 		cel.Types(&sbom.Metadata{}),
+		cel.Types(&sbom.Node{}),
+		cel.Types(&sbom.NodeList{}),
+		cel.Types(&sbom.Person{}),
+		cel.Types(&sbom.Property{}),
+		cel.Types(&sbom.SourceData{}),
+		cel.Types(&sbom.Tool{}),
 	}
 }
 
@@ -51,7 +63,6 @@ func (*Protobom) Types() []cel.EnvOption {
 func (*Protobom) Variables() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Variable("sboms", cel.MapType(cel.IntType, elements.DocumentType)),
-		cel.Variable("docs", cel.MapType(cel.IntType, cel.DynType)),
 		cel.Variable("protobom", elements.ProtobomType),
 	}
 }
