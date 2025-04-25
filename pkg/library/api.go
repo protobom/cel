@@ -13,8 +13,8 @@ import (
 
 // Functions returns the compile-time options that define the functions that
 // the protobom library exposes to the cel environment.
-func (*Protobom) Functions() []cel.EnvOption {
-	return []cel.EnvOption{
+func (p *Protobom) Functions() []cel.EnvOption {
+	envopt := []cel.EnvOption{
 		cel.Function(
 			"get_files",
 			cel.MemberOverload(
@@ -143,8 +143,16 @@ func (*Protobom) Functions() []cel.EnvOption {
 		cel.Function(
 			"get_nodes",
 			cel.MemberOverload(
-				"enodelist_get_nodes", []*cel.Type{cel.ObjectType("protobom.protobom.NodeList")}, types.NewListType(types.DynType),
-				cel.UnaryBinding(functions.NodeListGetNodes),
+				"enodelist_get_nodes", []*cel.Type{elements.NodeListType}, types.NewListType(types.DynType),
+				cel.UnaryBinding(functions.GetNodes),
+			),
+		),
+
+		cel.Function(
+			"get_edges",
+			cel.MemberOverload(
+				"enodelist_get_edges", []*cel.Type{elements.NodeListType}, types.NewListType(elements.EdgeType),
+				cel.UnaryBinding(functions.GetEdges),
 			),
 		),
 
@@ -188,15 +196,6 @@ func (*Protobom) Functions() []cel.EnvOption {
 		),
 
 		cel.Function(
-			"load_sbom",
-			cel.MemberOverload(
-				"protobom_loadsbom_binding",
-				[]*cel.Type{elements.ProtobomType, cel.StringType}, elements.DocumentType,
-				cel.BinaryBinding(functions.LoadSBOM),
-			),
-		),
-
-		cel.Function(
 			"relate_node_list_at_id",
 			cel.MemberOverload(
 				"sbom_relatenodesatid_binding",
@@ -217,14 +216,51 @@ func (*Protobom) Functions() []cel.EnvOption {
 				"sbom_get_authors",
 				[]*cel.Type{elements.DocumentType},
 				types.ListType, // result
-				cel.UnaryBinding(functions.DocumentAuthors),
+				cel.UnaryBinding(functions.GetAuthors),
 			),
 			cel.MemberOverload(
 				"metadata_get_authors",
 				[]*cel.Type{elements.MetadataType},
 				types.ListType, // result
-				cel.UnaryBinding(functions.DocumentAuthors),
+				cel.UnaryBinding(functions.GetAuthors),
+			),
+		),
+		// NodeList API functions
+		cel.Function(
+			"get_nodes_by_name",
+			cel.MemberOverload(
+				"nodelist_nodes_by_name",
+				[]*cel.Type{elements.NodeListType, types.StringType}, // args
+				types.ListType, // result
+				cel.BinaryBinding(functions.GetNodesByName), // handler
+			),
+		),
+		cel.Function(
+			"get_node_descendants",
+			cel.MemberOverload(
+				"nodelist_node_descendants",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType}, // args
+				elements.NodeListType,                                               // result
+				cel.FunctionBinding(functions.NodeDescendants),                      // handler
 			),
 		),
 	}
+
+	// Here we add all the functions that trigger I/O calls on the host system
+	// only if the option is enables. Most apps will not need them so we don't
+	// load them by default.
+	if p.Options.EnableIO {
+		envopt = append(
+			envopt,
+			cel.Function(
+				"load_sbom",
+				cel.MemberOverload(
+					"protobom_loadsbom_binding",
+					[]*cel.Type{elements.ProtobomType, cel.StringType}, elements.DocumentType,
+					cel.BinaryBinding(functions.LoadSBOM),
+				),
+			),
+		)
+	}
+	return envopt
 }

@@ -236,27 +236,6 @@ var LoadSBOM = func(_, pathVal ref.Val) ref.Val {
 	}
 }
 
-var NodesByPurlType = func(lhs, rhs ref.Val) ref.Val {
-	purlType, ok := rhs.Value().(string)
-	if !ok {
-		return types.NewErr("argument to GetNodesByPurlType must be a string")
-	}
-
-	var nl *sbom.NodeList
-	switch v := lhs.Value().(type) {
-	case *sbom.Document:
-		nl = v.NodeList.GetNodesByPurlType(purlType)
-	case *sbom.NodeList:
-		nl = v.GetNodesByPurlType(purlType)
-	default:
-		return types.NewErr("method unsupported on type %T", lhs.Value())
-	}
-
-	return &elements.NodeList{
-		NodeList: nl,
-	}
-}
-
 // RelateNodeListAtID relates a nodelist at the specified ID
 var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	if len(vals) != 4 {
@@ -298,8 +277,8 @@ var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	}
 }
 
-// DocumentAuthors returns the document authors in a generic struct
-var DocumentAuthors = func(lhs ref.Val) ref.Val {
+// GetAuthors returns the document authors in a generic struct
+var GetAuthors = func(lhs ref.Val) ref.Val {
 	var metadata *sbom.Metadata
 	switch v := lhs.Value().(type) {
 	case *sbom.Document:
@@ -353,11 +332,13 @@ var GetMetadata = func(lhs ref.Val) ref.Val {
 var RootNodes = func(lhs ref.Val) ref.Val {
 	switch v := lhs.Value().(type) {
 	case *sbom.Document:
-		nl := &sbom.NodeList{}
-		nl.Nodes = v.GetNodeList().GetRootNodes()
-		return &elements.NodeList{
-			NodeList: nl,
+		l := []ref.Val{}
+		for _, n := range v.GetRootNodes() {
+			l = append(l, &elements.Node{
+				Node: n,
+			})
 		}
+		return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
 	case *sbom.NodeList:
 		l := []ref.Val{}
 		for _, n := range v.GetRootNodes() {
@@ -372,7 +353,7 @@ var RootNodes = func(lhs ref.Val) ref.Val {
 }
 
 // GetNodes returns the list of nodes of the nodelist
-var NodeListGetNodes = func(lhs ref.Val) ref.Val {
+var GetNodes = func(lhs ref.Val) ref.Val {
 	switch v := lhs.Value().(type) {
 	case *sbom.NodeList:
 		l := []ref.Val{}
@@ -384,6 +365,22 @@ var NodeListGetNodes = func(lhs ref.Val) ref.Val {
 		return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
 	default:
 		return types.NewErr("argument to RootNodes only applies to NodeList")
+	}
+}
+
+// GetNodes returns the list of nodes of the nodelist
+var GetEdges = func(lhs ref.Val) ref.Val {
+	switch v := lhs.Value().(type) {
+	case *sbom.NodeList:
+		l := []ref.Val{}
+		for _, e := range v.Edges {
+			l = append(l, &elements.Edge{
+				Edge: e,
+			})
+		}
+		return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
+	default:
+		return types.NewErr("argument to GetEdges only applies to NodeList")
 	}
 }
 

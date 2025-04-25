@@ -67,16 +67,34 @@ func (md *Metadata) Get(index ref.Val) ref.Val {
 		switch v {
 		case "id":
 			return types.String(md.Id)
-		case "name":
+		case propName:
 			return types.String(md.Name)
-		case "version":
+		case propVersion:
 			return types.String(md.Version)
 		case "tools":
-			return types.NewDynamicList(types.DefaultTypeAdapter, md.Tools)
+			toolsList := make([]ref.Val, len(md.Tools))
+			for i, t := range md.Tools {
+				toolsList[i] = &Tool{
+					Tool: t,
+				}
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, toolsList)
+		case "authors":
+			authorsList := make([]ref.Val, len(md.Authors))
+			for i, p := range md.Authors {
+				authorsList[i] = &Person{
+					Person: p,
+				}
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, authorsList)
 		case "date":
 			return types.Timestamp{Time: md.Date.AsTime()}
-		case "comment":
+		case propComment:
 			return types.String(md.Comment)
+		case "source_data":
+			return &SourceData{
+				SourceData: md.SourceData,
+			}
 		default:
 			return types.NewErr("no such key %v", index)
 		}

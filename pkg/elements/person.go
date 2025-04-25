@@ -11,6 +11,7 @@ import (
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types/traits"
 	"github.com/protobom/protobom/pkg/sbom"
 )
 
@@ -56,4 +57,39 @@ func (*Person) Type() ref.Type {
 // Value implements ref.Val.Value.
 func (p *Person) Value() any {
 	return p.Person
+}
+
+var _ traits.Indexer = (*Person)(nil)
+
+// Get is the getter to implement the indexer trait
+func (p *Person) Get(index ref.Val) ref.Val {
+	switch v := index.Value().(type) {
+	case string:
+		switch v {
+		case propName:
+			return types.String(p.GetName())
+		case "is_org":
+			return types.Bool(p.GetIsOrg())
+		case "email":
+			return types.String(p.GetEmail())
+		case "phone":
+			return types.String(p.GetPhone())
+		case "contacts":
+			personsList := []ref.Val{}
+			if p.GetContacts() != nil {
+				for _, person := range p.GetContacts() {
+					p := &Person{
+						Person: person,
+					}
+					personsList = append(personsList, p)
+				}
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, personsList)
+		default:
+			return types.NewErr("no such key %v", index)
+		}
+
+	default:
+		return types.NewErr("no such key %v", index)
+	}
 }

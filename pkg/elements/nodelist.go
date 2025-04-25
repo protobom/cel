@@ -133,8 +133,9 @@ var _ traits.Indexer = (*NodeList)(nil)
 func (nl *NodeList) Get(index ref.Val) ref.Val {
 	switch v := index.Value().(type) {
 	case string:
-		if v == "nodes" {
-			nodesList := make([]ref.Val, len(v))
+		switch v {
+		case "nodes":
+			nodesList := make([]ref.Val, len(nl.Nodes))
 			for i, node := range nl.Nodes {
 				n := Node{
 					Node: node,
@@ -142,8 +143,16 @@ func (nl *NodeList) Get(index ref.Val) ref.Val {
 				nodesList[i] = n.ConvertToType(NodeType)
 			}
 			return types.NewRefValList(types.DefaultTypeAdapter, nodesList)
+		case "edges":
+			edgeList := make([]ref.Val, len(nl.Edges))
+			for i, e := range nl.Edges {
+				edgeList[i] = &Edge{
+					Edge: e,
+				}
+			}
+			return types.NewRefValList(types.DefaultTypeAdapter, edgeList)
 		}
-		return types.NewErr("no such key %v", index)
+		return types.NewErr("no such key in edge: %v", index)
 	default:
 		return types.NewErr("no such key %v", index)
 	}
