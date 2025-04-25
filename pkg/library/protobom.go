@@ -19,10 +19,18 @@ const (
 	Name = "cel.protobom.api"
 )
 
-type Protobom struct{}
+type Protobom struct {
+	Options Options
+}
 
-func NewProtobom() *Protobom {
-	return &Protobom{}
+func NewProtobom(funcs ...OptFunc) *Protobom {
+	opts := DefaultOptions
+	for _, fn := range funcs {
+		fn(&opts)
+	}
+	return &Protobom{
+		Options: opts,
+	}
 }
 
 // Types returns the types that the library defines in the CEL environment
@@ -60,10 +68,10 @@ func (*Protobom) Types() []cel.EnvOption {
 
 // Variables defines the global variables that are created in the CEL
 // environment when the library is included
-func (*Protobom) Variables() []cel.EnvOption {
+func (p *Protobom) Variables() []cel.EnvOption {
 	return []cel.EnvOption{
-		cel.Variable("sboms", cel.MapType(cel.IntType, elements.DocumentType)),
-		cel.Variable("protobom", elements.ProtobomType),
+		cel.Variable(p.Options.DocsVarName, cel.MapType(cel.IntType, elements.DocumentType)),
+		cel.Variable(p.Options.ProtobomVarName, elements.ProtobomType),
 	}
 }
 
