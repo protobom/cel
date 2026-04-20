@@ -1,9 +1,9 @@
 module github.com/protobom/cel
 
-go 1.24.0
+go 1.25.0
 
 require (
-	github.com/protobom/protobom v0.5.4
+	github.com/protobom/protobom v0.5.5
 	github.com/stretchr/testify v1.11.1
 	sigs.k8s.io/release-utils v0.12.4
 )
@@ -29,8 +29,8 @@ require (
 )
 
 require (
-	github.com/CycloneDX/cyclonedx-go v0.9.2 // indirect
-	github.com/anchore/go-struct-converter v0.0.0-20230627203149-c72ef8859ca9 // indirect
+	github.com/CycloneDX/cyclonedx-go v0.10.0 // indirect
+	github.com/anchore/go-struct-converter v0.1.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/cel-go v0.28.0
@@ -38,11 +38,11 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/spdx/tools-golang v0.5.5 // indirect
+	github.com/spdx/tools-golang v0.5.7 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240826202546-f6391c0de4c7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240826202546-f6391c0de4c7 // indirect
 	google.golang.org/protobuf v1.36.11
