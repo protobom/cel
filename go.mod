@@ -3,7 +3,7 @@ module github.com/protobom/cel
 go 1.25.11
 
 require (
-	github.com/protobom/protobom v0.5.6
+	github.com/protobom/protobom v0.5.8
 	github.com/stretchr/testify v1.11.1
 	sigs.k8s.io/release-utils v0.12.4
 )
