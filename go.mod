@@ -4,7 +4,7 @@ go 1.25.11
 
 require (
 	github.com/protobom/protobom v0.5.8
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	sigs.k8s.io/release-utils v0.12.4
 )
 
@@ -33,12 +33,10 @@ require (
 	github.com/CycloneDX/cyclonedx-go v0.11.0 // indirect
 	github.com/anchore/go-struct-converter v0.1.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/cel-go v0.31.0
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spdx/tools-golang v0.5.7 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
