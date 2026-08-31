@@ -2,8 +2,8 @@
 //
 // === BEGIN CODE === 
 
-sboms[0].RelateNodeListAtID(
-    sboms[1].NodesByPurlType("golang"),
+sboms[0].relate_node_list_at_id(
+    sboms[1].get_nodes_by_purl_type("golang"),
     "File-bom",
     "DEPENDS_ON"
 )
@@ -27,7 +27,7 @@ sboms[0].RelateNodeListAtID(
 //
 //
 // The second SBOM (bom-github.spdx.json) is an SPDX SBOM downloaded from the
-// GitHub self service SBOM feature. It describes the github respoitory housing
+// GitHub self service SBOM feature. It describes the github repository housing
 // the code that compiled the tool above:
 //
 // 📂 SPDX Document com.github.kubernetes-sigs/bom
@@ -59,6 +59,6 @@ sboms[0].RelateNodeListAtID(
 // - githubactions (from the repository CI)
 //
 // The following CEL program extracts the go dependencies from the second
-// SBOM and remixes them into the first to enrich its data. He resulting SBOM
+// SBOM and remixes them into the first to enrich its data. The resulting SBOM
 // describes the full dependency list of the binary.
 //
