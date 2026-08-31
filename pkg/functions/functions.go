@@ -332,16 +332,18 @@ var GetMetadata = func(lhs ref.Val) ref.Val {
 var RootNodes = func(lhs ref.Val) ref.Val {
 	switch v := lhs.Value().(type) {
 	case *sbom.Document:
-		l := []ref.Val{}
-		for _, n := range v.GetRootNodes() {
+		roots := v.GetRootNodes()
+		l := make([]ref.Val, 0, len(roots))
+		for _, n := range roots {
 			l = append(l, &elements.Node{
 				Node: n,
 			})
 		}
 		return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
 	case *sbom.NodeList:
-		l := []ref.Val{}
-		for _, n := range v.GetRootNodes() {
+		roots := v.GetRootNodes()
+		l := make([]ref.Val, 0, len(roots))
+		for _, n := range roots {
 			l = append(l, &elements.Node{
 				Node: n,
 			})
@@ -356,7 +358,7 @@ var RootNodes = func(lhs ref.Val) ref.Val {
 var GetNodes = func(lhs ref.Val) ref.Val {
 	switch v := lhs.Value().(type) {
 	case *sbom.NodeList:
-		l := []ref.Val{}
+		l := make([]ref.Val, 0, len(v.Nodes))
 		for _, n := range v.Nodes {
 			l = append(l, &elements.Node{
 				Node: n,
@@ -372,7 +374,7 @@ var GetNodes = func(lhs ref.Val) ref.Val {
 var GetEdges = func(lhs ref.Val) ref.Val {
 	switch v := lhs.Value().(type) {
 	case *sbom.NodeList:
-		l := []ref.Val{}
+		l := make([]ref.Val, 0, len(v.Edges))
 		for _, e := range v.Edges {
 			l = append(l, &elements.Edge{
 				Edge: e,

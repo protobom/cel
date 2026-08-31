@@ -14,11 +14,13 @@ import (
 	"github.com/protobom/cel/pkg/runner"
 )
 
+const testSBOMPath = "testdata/github.spdx.json"
+
 func TestMetadataGet(t *testing.T) {
 	r, err := runner.NewRunner()
 	require.NoError(t, err)
 	vars, err := runner.BuildVariables(
-		runner.WithPaths([]string{"testdata/github.spdx.json"}),
+		runner.WithPaths([]string{testSBOMPath}),
 	)
 	require.NoError(t, err)
 
@@ -28,11 +30,11 @@ func TestMetadataGet(t *testing.T) {
 		mustErr bool
 		eval    func(*testing.T, ref.Val)
 	}{
-		{"name", "sboms[0].metadata.id", false, func(t *testing.T, v ref.Val) {
+		{"id", "sboms[0].metadata.id", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "https://github.com/kubernetes-sigs/bom/dependency_graph/sbom-97744edb52ba65a1#DOCUMENT", v.Value())
 		}},
-		{"name", "sboms[0].metadata.version", false, func(t *testing.T, v ref.Val) {
+		{"version", "sboms[0].metadata.version", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "1", v.Value())
 		}},
@@ -40,7 +42,7 @@ func TestMetadataGet(t *testing.T) {
 			t.Helper()
 			require.Equal(t, "com.github.kubernetes-sigs/bom", v.Value())
 		}},
-		{"name", "sboms[0].metadata.date", false, func(t *testing.T, v ref.Val) {
+		{"date", "sboms[0].metadata.date", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			tm, err := time.Parse("2006-01-02 15:04:05 -0700", "2023-08-10 01:04:39 -0000")
 			require.NoError(t, err)
@@ -65,7 +67,7 @@ func TestGetMetadataGet(t *testing.T) {
 	r, err := runner.NewRunner()
 	require.NoError(t, err)
 	vars, err := runner.BuildVariables(
-		runner.WithPaths([]string{"testdata/github.spdx.json"}),
+		runner.WithPaths([]string{testSBOMPath}),
 	)
 	require.NoError(t, err)
 
@@ -75,11 +77,11 @@ func TestGetMetadataGet(t *testing.T) {
 		mustErr bool
 		eval    func(*testing.T, ref.Val)
 	}{
-		{"name", "sboms[0].get_metadata().id", false, func(t *testing.T, v ref.Val) {
+		{"id", "sboms[0].get_metadata().id", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "https://github.com/kubernetes-sigs/bom/dependency_graph/sbom-97744edb52ba65a1#DOCUMENT", v.Value())
 		}},
-		{"name", "sboms[0].get_metadata().version", false, func(t *testing.T, v ref.Val) {
+		{"version", "sboms[0].get_metadata().version", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "1", v.Value())
 		}},
@@ -87,13 +89,13 @@ func TestGetMetadataGet(t *testing.T) {
 			t.Helper()
 			require.Equal(t, "com.github.kubernetes-sigs/bom", v.Value())
 		}},
-		{"name", "sboms[0].get_metadata().date", false, func(t *testing.T, v ref.Val) {
+		{"date", "sboms[0].get_metadata().date", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			tm, err := time.Parse("2006-01-02 15:04:05 -0700", "2023-08-10 01:04:39 -0000")
 			require.NoError(t, err)
 			require.Equal(t, tm.UTC(), v.Value())
 		}},
-		{"name", "sboms[0].get_metadata().get_authors()", false, func(t *testing.T, v ref.Val) {
+		{"authors", "sboms[0].get_metadata().get_authors()", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.NoError(t, err)
 			docdata, ok := v.Value().([]*sbom.Person)

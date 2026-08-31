@@ -71,9 +71,8 @@ func (r *Runner) Evaluate(code string, variables map[string]any) (ref.Val, error
 // CreateEnvironment creates a CEL environment with the protobom
 // library loaded.
 func CreateEnvironment(opts *Options) (*cel.Env, error) {
-	envOpts := []cel.EnvOption{
-		library.NewProtobom().EnvOption(),
-	}
+	envOpts := make([]cel.EnvOption, 0, 1+len(opts.EnvOptions))
+	envOpts = append(envOpts, library.NewProtobom().EnvOption())
 
 	// Add any additional environment options defined in the options
 	envOpts = append(envOpts, opts.EnvOptions...)
@@ -83,7 +82,7 @@ func CreateEnvironment(opts *Options) (*cel.Env, error) {
 		envOpts...,
 	)
 	if err != nil {
-		return nil, (fmt.Errorf("creating CEL environment: %w", err))
+		return nil, fmt.Errorf("creating CEL environment: %w", err)
 	}
 
 	return env, nil
