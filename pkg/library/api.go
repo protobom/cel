@@ -230,18 +230,18 @@ func (p *Protobom) Functions() []cel.EnvOption {
 			"get_nodes_by_name",
 			cel.MemberOverload(
 				"nodelist_nodes_by_name",
-				[]*cel.Type{elements.NodeListType, types.StringType}, // args
-				types.ListType, // result
-				cel.BinaryBinding(functions.GetNodesByName), // handler
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				types.ListType,
+				cel.BinaryBinding(functions.GetNodesByName),
 			),
 		),
 		cel.Function(
 			"get_node_descendants",
 			cel.MemberOverload(
 				"nodelist_node_descendants",
-				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType}, // args
-				elements.NodeListType,                                               // result
-				cel.FunctionBinding(functions.NodeDescendants),                      // handler
+				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.NodeDescendants),
 			),
 		),
 	}

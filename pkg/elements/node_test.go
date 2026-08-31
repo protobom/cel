@@ -16,7 +16,7 @@ func TestNodeGet(t *testing.T) {
 	r, err := runner.NewRunner()
 	require.NoError(t, err)
 	vars, err := runner.BuildVariables(
-		runner.WithPaths([]string{"testdata/github.spdx.json"}),
+		runner.WithPaths([]string{testSBOMPath}),
 	)
 	require.NoError(t, err)
 
@@ -26,19 +26,19 @@ func TestNodeGet(t *testing.T) {
 		mustErr bool
 		eval    func(*testing.T, ref.Val)
 	}{
-		{"name", "sboms[0].node_list.get_root_nodes()[0].name", false, func(t *testing.T, v ref.Val) {
+		{"root-name", "sboms[0].node_list.get_root_nodes()[0].name", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "com.github.kubernetes-sigs/bom", v.Value())
 		}},
-		{"name", "sboms[0].node_list.get_root_nodes()[0].version", false, func(t *testing.T, v ref.Val) {
+		{"root-version", "sboms[0].node_list.get_root_nodes()[0].version", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "2cc9dcc83b2867047edff143905829ff9e3b98ff", v.Value())
 		}},
-		{"name", "sboms[0].node_list.get_root_nodes()[0].url_download", false, func(t *testing.T, v ref.Val) {
+		{"root-url-download", "sboms[0].node_list.get_root_nodes()[0].url_download", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, "git+https://github.com/kubernetes-sigs/bom@2cc9dcc83b2867047edff143905829ff9e3b98ff", v.Value())
 		}},
-		{"name", "sboms[0].node_list.get_root_nodes()[0].licenses", false, func(t *testing.T, v ref.Val) {
+		{"root-licenses", "sboms[0].node_list.get_root_nodes()[0].licenses", false, func(t *testing.T, v ref.Val) {
 			t.Helper()
 			require.Equal(t, []string{"Apache-2.0"}, v.Value())
 		}},
