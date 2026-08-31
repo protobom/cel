@@ -1,10 +1,17 @@
 // Read an SBOM from disk. This expression evaluates to a Protobom document.
 // You can use this construct to feed a document into functions that expect
-// them. 
-// 
-// To store an SBOM document in a variable, use the native bind function
+// them.
+//
+// Note that load_sbom() reads from the host filesystem, so it is only
+// available when the protobom library is loaded with the EnableIO option:
+//
+//   library.NewProtobom(library.WithEnableIO(true))
+//
+// The default runner options do not enable it.
+//
+// To store an SBOM document in a variable, use the native bind function of
 // the CEL runtime:
 //
-// cel.bind(myvar, protobom.LoadSBOM("examples/curl.spdx.json"), myvar)
-// 
-protobom.LoadSBOM("examples/curl.spdx.json")
+// cel.bind(myvar, protobom.load_sbom("examples/curl.spdx.json"), myvar)
+//
+protobom.load_sbom("examples/curl.spdx.json")

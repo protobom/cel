@@ -1,1 +1,4 @@
-sboms[0].NodesByPurlType("golang").ToDocument()
+// This query extracts all nodes with a package URL of a certain type and
+// returns them in a new Document. Run it against an SBOM with go dependencies,
+// for example bom-github.spdx.json in this directory.
+sboms[0].get_nodes_by_purl_type("golang").to_document()

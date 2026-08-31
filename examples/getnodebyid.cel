@@ -1,1 +1,3 @@
-sboms[0].NodeByID("Package-curl-8.1.2-r0")
+// This query looks up a single node by its identifier. Run it against
+// curl.spdx.json in this directory to find the curl package node.
+sboms[0].get_node_by_id("Package-curl-8.1.2-r0")

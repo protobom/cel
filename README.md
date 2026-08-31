@@ -73,8 +73,8 @@ Contributions are welcome!
 
 ## Documentation
 
-We have some [documentation](docs) and [examples](examples), we'll expand them
-as soon as we've moved in.
+Check out the [function reference](docs/functions.md) and the collection of
+[example CEL programs](examples).
 
 ## History
 
