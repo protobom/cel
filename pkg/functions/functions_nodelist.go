@@ -5,6 +5,7 @@ package functions
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -14,10 +15,18 @@ import (
 	"github.com/protobom/cel/pkg/elements"
 )
 
-// edgeTypeFromString resolves the name of a protobom relationship type.
+// edgeTypeFromString resolves the name of a protobom relationship type. The
+// match ignores case and underscores, so the protobom name (dependsOn) and
+// SPDX-style spellings (DEPENDS_ON) name the same type.
 func edgeTypeFromString(name string) (sbom.Edge_Type, error) {
-	if v, ok := sbom.Edge_Type_value[name]; ok {
-		return sbom.Edge_Type(v), nil
+	normalize := func(s string) string {
+		return strings.ToLower(strings.ReplaceAll(s, "_", ""))
+	}
+	normalized := normalize(name)
+	for typeName, value := range sbom.Edge_Type_value {
+		if normalize(typeName) == normalized {
+			return sbom.Edge_Type(value), nil
+		}
 	}
 	return sbom.Edge_UNKNOWN, fmt.Errorf("unknown relationship type %q", name)
 }

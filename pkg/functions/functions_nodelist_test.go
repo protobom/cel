@@ -288,3 +288,19 @@ func TestFunctionNodeGetPurl(t *testing.T) {
 	bare := &elements.Node{Node: &sbom.Node{Id: "b"}}
 	require.Equal(t, types.String(""), NodeGetPurl(bare))
 }
+
+// TestEdgeTypeFromString checks the tolerant relationship type resolution.
+func TestEdgeTypeFromString(t *testing.T) {
+	for _, name := range []string{"dependsOn", "DEPENDS_ON", "dependson"} {
+		et, err := edgeTypeFromString(name)
+		require.NoError(t, err, name)
+		require.Equal(t, sbom.Edge_dependsOn, et, name)
+	}
+
+	et, err := edgeTypeFromString("CONTAINED_BY")
+	require.NoError(t, err)
+	require.Equal(t, sbom.Edge_contained_by, et)
+
+	_, err = edgeTypeFromString("not-a-type")
+	require.Error(t, err)
+}
