@@ -49,16 +49,28 @@ var ToNodeList = func(lhs ref.Val) ref.Val {
 	}
 }
 
-var Addition = func(_, _ ref.Val) ref.Val {
+// Addition returns a new nodelist with the union of both operands. The
+// returned list shares no nodes or edges with the operands.
+var Addition = func(lhs, rhs ref.Val) ref.Val {
+	nl1, ok := lhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("add only applies to a nodelist, not %T", lhs.Value())
+	}
+	nl2, ok := rhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("only a nodelist can be added to a nodelist, not %T", rhs.Value())
+	}
 	return &elements.NodeList{
-		NodeList: &sbom.NodeList{},
+		NodeList: nl1.Union(nl2),
 	}
 }
 
-var AdditionOp = func(...ref.Val) ref.Val {
-	return &elements.NodeList{
-		NodeList: &sbom.NodeList{},
+// AdditionOp is the variadic form of Addition.
+var AdditionOp = func(vals ...ref.Val) ref.Val {
+	if len(vals) != 2 {
+		return types.NewErr("incorrect number of params")
 	}
+	return Addition(vals[0], vals[1])
 }
 
 // NodeByID returns a Node matching the specified ID

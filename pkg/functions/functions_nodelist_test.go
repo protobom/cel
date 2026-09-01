@@ -17,6 +17,7 @@ import (
 const (
 	rootNodeID = "root"
 	midNodeID  = "mid"
+	leafNodeID = "leaf"
 )
 
 // testGraphNodeList builds the chain root -> mid -> leaf the graph function
@@ -25,11 +26,11 @@ func testGraphNodeList() *elements.NodeList {
 	return &elements.NodeList{
 		NodeList: &sbom.NodeList{
 			Nodes: []*sbom.Node{
-				{Id: rootNodeID}, {Id: midNodeID}, {Id: "leaf"},
+				{Id: rootNodeID}, {Id: midNodeID}, {Id: leafNodeID},
 			},
 			Edges: []*sbom.Edge{
 				{Type: sbom.Edge_contains, From: rootNodeID, To: []string{midNodeID}},
-				{Type: sbom.Edge_dependsOn, From: midNodeID, To: []string{"leaf"}},
+				{Type: sbom.Edge_dependsOn, From: midNodeID, To: []string{leafNodeID}},
 			},
 			RootElements: []string{"root"},
 		},
@@ -37,17 +38,17 @@ func testGraphNodeList() *elements.NodeList {
 }
 
 func TestFunctionNodeAncestors(t *testing.T) {
-	res := NodeAncestors(testGraphNodeList(), types.String("leaf"), types.Int(10))
+	res := NodeAncestors(testGraphNodeList(), types.String(leafNodeID), types.Int(10))
 	nl, ok := res.Value().(*sbom.NodeList)
 	require.True(t, ok, "%v", res)
 	require.Len(t, nl.Nodes, 3, "the whole chain above the leaf comes back")
 
-	res = NodeAncestors(testGraphNodeList(), types.String("leaf"), types.Int(1))
+	res = NodeAncestors(testGraphNodeList(), types.String(leafNodeID), types.Int(1))
 	nl, ok = res.Value().(*sbom.NodeList)
 	require.True(t, ok)
 	require.Len(t, nl.Nodes, 2, "one level up returns the direct parent")
 
-	res = NodeAncestors(testGraphNodeList(), types.String("leaf"))
+	res = NodeAncestors(testGraphNodeList(), types.String(leafNodeID))
 	require.True(t, types.IsError(res), "missing arguments must error")
 }
 
@@ -58,14 +59,14 @@ func TestFunctionGetEdgesFrom(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, types.Int(1), lister.Size())
 
-	res = GetEdgesFrom(testGraphNodeList(), types.String("leaf"))
+	res = GetEdgesFrom(testGraphNodeList(), types.String(leafNodeID))
 	lister, ok = res.(traits.Lister)
 	require.True(t, ok)
 	require.Equal(t, types.Int(0), lister.Size())
 }
 
 func TestFunctionGetEdgesTo(t *testing.T) {
-	res := GetEdgesTo(testGraphNodeList(), types.String("leaf"))
+	res := GetEdgesTo(testGraphNodeList(), types.String(leafNodeID))
 	require.False(t, types.IsError(res), "%v", res)
 	lister, ok := res.(traits.Lister)
 	require.True(t, ok)
@@ -79,7 +80,7 @@ func TestFunctionGetEdgesTo(t *testing.T) {
 
 func TestFunctionUnrelateNodes(t *testing.T) {
 	sut := testGraphNodeList()
-	res := UnrelateNodes(sut, types.String(midNodeID), types.String("leaf"), types.String("dependsOn"))
+	res := UnrelateNodes(sut, types.String(midNodeID), types.String(leafNodeID), types.String("dependsOn"))
 	nl, ok := res.Value().(*sbom.NodeList)
 	require.True(t, ok, "%v", res)
 	require.Len(t, nl.Edges, 1, "the dependsOn edge is gone")
@@ -87,7 +88,7 @@ func TestFunctionUnrelateNodes(t *testing.T) {
 
 	require.Len(t, sut.Edges, 2, "the original nodelist is not modified")
 
-	res = UnrelateNodes(sut, types.String(midNodeID), types.String("leaf"), types.String("not-a-type"))
+	res = UnrelateNodes(sut, types.String(midNodeID), types.String(leafNodeID), types.String("not-a-type"))
 	require.True(t, types.IsError(res), "an unknown relationship type must error")
 }
 
@@ -103,4 +104,31 @@ func TestFunctionRemoveEdgesFrom(t *testing.T) {
 
 	res = RemoveEdgesFrom(sut, types.String(rootNodeID), types.String("not-a-type"))
 	require.True(t, types.IsError(res), "an unknown relationship type must error")
+}
+
+func TestFunctionAddition(t *testing.T) {
+	nl1 := testGraphNodeList()
+	nl2 := &elements.NodeList{
+		NodeList: &sbom.NodeList{
+			Nodes:        []*sbom.Node{{Id: leafNodeID}, {Id: "extra"}},
+			Edges:        []*sbom.Edge{{Type: sbom.Edge_dependsOn, From: leafNodeID, To: []string{"extra"}}},
+			RootElements: []string{},
+		},
+	}
+
+	res := Addition(nl1, nl2)
+	nl, ok := res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Len(t, nl.Nodes, 4, "the union combines the nodes of both lists")
+	require.Len(t, nl.Edges, 3)
+	require.Len(t, nl1.Nodes, 3, "the operands are not modified")
+	require.Len(t, nl2.Nodes, 2, "the operands are not modified")
+
+	res = Addition(nl1, types.String("not a nodelist"))
+	require.True(t, types.IsError(res), "adding anything but a nodelist must error")
+
+	res = AdditionOp(nl1, nl2)
+	nl, ok = res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Len(t, nl.Nodes, 4)
 }

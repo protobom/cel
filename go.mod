@@ -3,7 +3,7 @@ module github.com/protobom/cel
 go 1.25.11
 
 require (
-	github.com/protobom/protobom v0.6.0
+	github.com/protobom/protobom v0.6.1
 	github.com/stretchr/testify v1.12.1
 	sigs.k8s.io/release-utils v0.12.4
 )
@@ -24,13 +24,13 @@ require (
 	github.com/olekukonko/errors v1.2.0 // indirect
 	github.com/olekukonko/ll v0.1.6 // indirect
 	github.com/olekukonko/tablewriter v1.1.4 // indirect
-	github.com/sirupsen/logrus v1.10.1 // indirect
+	github.com/sirupsen/logrus v1.10.2 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 )
 
 require (
-	github.com/CycloneDX/cyclonedx-go v0.11.0 // indirect
+	github.com/CycloneDX/cyclonedx-go v0.12.0 // indirect
 	github.com/anchore/go-struct-converter v0.1.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/google/cel-go v0.31.0
