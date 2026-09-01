@@ -49,16 +49,28 @@ var ToNodeList = func(lhs ref.Val) ref.Val {
 	}
 }
 
-var Addition = func(_, _ ref.Val) ref.Val {
+// Addition returns a new nodelist with the union of both operands. The
+// returned list shares no nodes or edges with the operands.
+var Addition = func(lhs, rhs ref.Val) ref.Val {
+	nl1, ok := lhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("add only applies to a nodelist, not %T", lhs.Value())
+	}
+	nl2, ok := rhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("only a nodelist can be added to a nodelist, not %T", rhs.Value())
+	}
 	return &elements.NodeList{
-		NodeList: &sbom.NodeList{},
+		NodeList: nl1.Union(nl2),
 	}
 }
 
-var AdditionOp = func(...ref.Val) ref.Val {
-	return &elements.NodeList{
-		NodeList: &sbom.NodeList{},
+// AdditionOp is the variadic form of Addition.
+var AdditionOp = func(vals ...ref.Val) ref.Val {
+	if len(vals) != 2 {
+		return types.NewErr("incorrect number of params")
 	}
+	return Addition(vals[0], vals[1])
 }
 
 // NodeByID returns a Node matching the specified ID
@@ -236,41 +248,53 @@ var LoadSBOM = func(_, pathVal ref.Val) ref.Val {
 	}
 }
 
-// RelateNodeListAtID relates a nodelist at the specified ID
+// RelateNodeListAtID relates a nodelist to the node with the specified ID
+// through a relationship of the named type. The document or nodelist the
+// function is invoked on is not modified: the returned element is a new one
+// with the relationship added.
 var RelateNodeListAtID = func(vals ...ref.Val) ref.Val {
 	if len(vals) != 4 {
-		return types.NewErr("invalid number of arguments for RealteAtNodeListAtID")
+		return types.NewErr("invalid number of arguments for RelateNodeListAtID")
 	}
 	id, ok := vals[2].Value().(string)
 	if !ok {
 		return types.NewErr("node id has to be a string")
 	}
-	// relType, this should be used below instead of Edge_dependsOn
-	_, ok = vals[3].Value().(string)
+	typeName, ok := vals[3].Value().(string)
 	if !ok {
-		return types.NewErr("relationship type has has to be a string")
+		return types.NewErr("relationship type has to be a string")
+	}
+	edgeType, err := edgeTypeFromString(typeName)
+	if err != nil {
+		return types.NewErr("%v", err)
 	}
 
-	nodelist, ok := vals[1].(*elements.NodeList)
+	nodelist, ok := vals[1].Value().(*sbom.NodeList)
 	if !ok {
 		return types.NewErr("could not cast nodelist")
 	}
 
 	switch v := vals[0].Value().(type) {
 	case *sbom.Document:
-		// TODO(puerco): Lookup reltype we read from vals[3]
-		if err := v.NodeList.RelateNodeListAtID(nodelist.NodeList, id, sbom.Edge_dependsOn); err != nil {
+		newList := v.NodeList.Copy()
+		if err := newList.RelateNodeListAtID(nodelist, id, edgeType); err != nil {
 			return types.NewErr("relating nodelist: %w", err)
 		}
+		// The metadata is shared with the original document: nothing in
+		// this operation modifies it.
 		return &elements.Document{
-			Document: v,
+			Document: &sbom.Document{
+				Metadata: v.Metadata,
+				NodeList: newList,
+			},
 		}
 	case *sbom.NodeList:
-		if err := v.RelateNodeListAtID(nodelist.NodeList, id, sbom.Edge_dependsOn); err != nil {
+		newList := v.Copy()
+		if err := newList.RelateNodeListAtID(nodelist, id, edgeType); err != nil {
 			return types.NewErr("relating nodelist: %w", err)
 		}
 		return &elements.NodeList{
-			NodeList: v,
+			NodeList: newList,
 		}
 	default:
 		return types.NewErr("method unsupported on type %T", vals[0].Value())
@@ -422,4 +446,14 @@ var NodeGetOriginators = func(lhs ref.Val) ref.Val {
 	default:
 		return types.NewErr("GetOriginators only applies to Node")
 	}
+}
+
+// NodeGetPurl returns the package URL of a node as a string. Nodes without
+// a purl, files among them, evaluate to an empty string.
+var NodeGetPurl = func(lhs ref.Val) ref.Val {
+	node, ok := lhs.Value().(*sbom.Node)
+	if !ok {
+		return types.NewErr("get_purl only applies to Node")
+	}
+	return types.String(node.Purl())
 }

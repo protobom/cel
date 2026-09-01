@@ -206,7 +206,7 @@ func (p *Protobom) Functions() []cel.EnvOption {
 			cel.MemberOverload(
 				"nodelist_relatenodesatid_binding",
 				[]*cel.Type{elements.NodeListType, elements.NodeListType, cel.StringType, cel.StringType},
-				elements.DocumentType, // result
+				elements.NodeListType, // result
 				cel.FunctionBinding(functions.RelateNodeListAtID),
 			),
 		),
@@ -242,6 +242,166 @@ func (p *Protobom) Functions() []cel.EnvOption {
 				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType},
 				elements.NodeListType,
 				cel.FunctionBinding(functions.NodeDescendants),
+			),
+		),
+		// get_node_ancestors walks the graph upwards from a node, mirroring
+		// get_node_descendants.
+		cel.Function(
+			"get_node_ancestors",
+			cel.MemberOverload(
+				"nodelist_node_ancestors",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.NodeAncestors),
+			),
+		),
+		// get_edges_from returns the edges originating at a node.
+		cel.Function(
+			"get_edges_from",
+			cel.MemberOverload(
+				"nodelist_get_edges_from",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				types.NewListType(elements.EdgeType),
+				cel.BinaryBinding(functions.GetEdgesFrom),
+			),
+		),
+		// get_edges_to returns the edges pointing to a node.
+		cel.Function(
+			"get_edges_to",
+			cel.MemberOverload(
+				"nodelist_get_edges_to",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				types.NewListType(elements.EdgeType),
+				cel.BinaryBinding(functions.GetEdgesTo),
+			),
+		),
+		// unrelate_nodes returns a new nodelist with one relationship
+		// (from, to, type) removed.
+		cel.Function(
+			"unrelate_nodes",
+			cel.MemberOverload(
+				"nodelist_unrelate_nodes",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.StringType, types.StringType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.UnrelateNodes),
+			),
+		),
+		// remove_edges_from returns a new nodelist without the edges of the
+		// given type originating at a node.
+		cel.Function(
+			"remove_edges_from",
+			cel.MemberOverload(
+				"nodelist_remove_edges_from",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.StringType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.RemoveEdgesFrom),
+			),
+		),
+		// diff compares two documents, nodelists or nodes and returns a map
+		// describing the changes, always carrying a "count" entry. The
+		// optional boolean makes identifier changes count as changes.
+		cel.Function(
+			"diff",
+			cel.MemberOverload(
+				"nodelist_diff",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"nodelist_diff_ids",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType, types.BoolType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"document_diff",
+				[]*cel.Type{elements.DocumentType, elements.DocumentType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"document_diff_ids",
+				[]*cel.Type{elements.DocumentType, elements.DocumentType, types.BoolType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"node_diff",
+				[]*cel.Type{elements.NodeType, elements.NodeType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"node_diff_ids",
+				[]*cel.Type{elements.NodeType, elements.NodeType, types.BoolType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+		),
+		// intersect returns a new nodelist with the nodes and relationships
+		// common to both operands.
+		cel.Function(
+			"intersect",
+			cel.MemberOverload(
+				"nodelist_intersect",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.Intersect),
+			),
+		),
+		// get_node_graph returns the full graph of the node with the given
+		// ID.
+		cel.Function(
+			"get_node_graph",
+			cel.MemberOverload(
+				"nodelist_node_graph",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.NodeGraph),
+			),
+		),
+		// get_node_siblings returns the fragment with the immediate
+		// siblings of the node with the given ID.
+		cel.Function(
+			"get_node_siblings",
+			cel.MemberOverload(
+				"nodelist_node_siblings",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.NodeSiblings),
+			),
+		),
+		// get_nodes_by_identifier returns the nodes carrying an identifier
+		// of the named type with the given value.
+		cel.Function(
+			"get_nodes_by_identifier",
+			cel.MemberOverload(
+				"nodelist_nodes_by_identifier",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.StringType},
+				types.NewListType(elements.NodeType),
+				cel.FunctionBinding(functions.GetNodesByIdentifier),
+			),
+		),
+		// get_matching_node looks up the node describing the same software
+		// as the provided node, matching by hashes and package URL.
+		cel.Function(
+			"get_matching_node",
+			cel.MemberOverload(
+				"nodelist_matching_node",
+				[]*cel.Type{elements.NodeListType, elements.NodeType},
+				elements.NodeType,
+				cel.BinaryBinding(functions.GetMatchingNode),
+			),
+		),
+		// get_purl returns the package URL of a node as a string.
+		cel.Function(
+			"get_purl",
+			cel.MemberOverload(
+				"node_get_purl",
+				[]*cel.Type{elements.NodeType},
+				types.StringType,
+				cel.UnaryBinding(functions.NodeGetPurl),
 			),
 		),
 	}
