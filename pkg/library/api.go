@@ -206,7 +206,7 @@ func (p *Protobom) Functions() []cel.EnvOption {
 			cel.MemberOverload(
 				"nodelist_relatenodesatid_binding",
 				[]*cel.Type{elements.NodeListType, elements.NodeListType, cel.StringType, cel.StringType},
-				elements.DocumentType, // result
+				elements.NodeListType, // result
 				cel.FunctionBinding(functions.RelateNodeListAtID),
 			),
 		),

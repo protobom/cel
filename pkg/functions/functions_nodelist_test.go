@@ -15,9 +15,11 @@ import (
 )
 
 const (
-	rootNodeID = "root"
-	midNodeID  = "mid"
-	leafNodeID = "leaf"
+	rootNodeID   = "root"
+	midNodeID    = "mid"
+	leafNodeID   = "leaf"
+	containsName = "contains"
+	incomingID   = "incoming"
 )
 
 // testGraphNodeList builds the chain root -> mid -> leaf the graph function
@@ -94,7 +96,7 @@ func TestFunctionUnrelateNodes(t *testing.T) {
 
 func TestFunctionRemoveEdgesFrom(t *testing.T) {
 	sut := testGraphNodeList()
-	res := RemoveEdgesFrom(sut, types.String(rootNodeID), types.String("contains"))
+	res := RemoveEdgesFrom(sut, types.String(rootNodeID), types.String(containsName))
 	nl, ok := res.Value().(*sbom.NodeList)
 	require.True(t, ok, "%v", res)
 	require.Len(t, nl.Edges, 1)
@@ -131,4 +133,55 @@ func TestFunctionAddition(t *testing.T) {
 	nl, ok = res.Value().(*sbom.NodeList)
 	require.True(t, ok, "%v", res)
 	require.Len(t, nl.Nodes, 4)
+}
+
+func TestFunctionRelateNodeListAtID(t *testing.T) {
+	incoming := &elements.NodeList{
+		NodeList: &sbom.NodeList{
+			Nodes:        []*sbom.Node{{Id: incomingID}},
+			Edges:        []*sbom.Edge{},
+			RootElements: []string{incomingID},
+		},
+	}
+
+	t.Run("on a nodelist", func(t *testing.T) {
+		sut := testGraphNodeList()
+		res := RelateNodeListAtID(sut, incoming, types.String(leafNodeID), types.String(containsName))
+		nl, ok := res.Value().(*sbom.NodeList)
+		require.True(t, ok, "%v", res)
+		require.Len(t, nl.Nodes, 4)
+
+		// The relationship carries the requested type, not dependsOn:
+		found := false
+		for _, e := range nl.Edges {
+			if e.From == leafNodeID && e.Type == sbom.Edge_contains {
+				require.Equal(t, []string{incomingID}, e.To)
+				found = true
+			}
+		}
+		require.True(t, found, "the new relationship must use the requested type")
+
+		require.Len(t, sut.Nodes, 3, "the original nodelist is not modified")
+		require.Len(t, sut.Edges, 2, "the original nodelist is not modified")
+	})
+
+	t.Run("on a document", func(t *testing.T) {
+		sut := &elements.Document{
+			Document: &sbom.Document{
+				Metadata: &sbom.Metadata{Id: "test-doc"},
+				NodeList: testGraphNodeList().NodeList,
+			},
+		}
+		res := RelateNodeListAtID(sut, incoming, types.String(leafNodeID), types.String(containsName))
+		doc, ok := res.Value().(*sbom.Document)
+		require.True(t, ok, "%v", res)
+		require.Len(t, doc.NodeList.Nodes, 4)
+		require.Equal(t, "test-doc", doc.Metadata.Id)
+		require.Len(t, sut.NodeList.Nodes, 3, "the original document is not modified")
+	})
+
+	t.Run("an unknown relationship type errors", func(t *testing.T) {
+		res := RelateNodeListAtID(testGraphNodeList(), incoming, types.String(leafNodeID), types.String("not-a-type"))
+		require.True(t, types.IsError(res))
+	})
 }
