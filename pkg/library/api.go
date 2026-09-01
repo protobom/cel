@@ -244,6 +244,59 @@ func (p *Protobom) Functions() []cel.EnvOption {
 				cel.FunctionBinding(functions.NodeDescendants),
 			),
 		),
+		// get_node_ancestors walks the graph upwards from a node, mirroring
+		// get_node_descendants.
+		cel.Function(
+			"get_node_ancestors",
+			cel.MemberOverload(
+				"nodelist_node_ancestors",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.IntType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.NodeAncestors),
+			),
+		),
+		// get_edges_from returns the edges originating at a node.
+		cel.Function(
+			"get_edges_from",
+			cel.MemberOverload(
+				"nodelist_get_edges_from",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				types.NewListType(elements.EdgeType),
+				cel.BinaryBinding(functions.GetEdgesFrom),
+			),
+		),
+		// get_edges_to returns the edges pointing to a node.
+		cel.Function(
+			"get_edges_to",
+			cel.MemberOverload(
+				"nodelist_get_edges_to",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				types.NewListType(elements.EdgeType),
+				cel.BinaryBinding(functions.GetEdgesTo),
+			),
+		),
+		// unrelate_nodes returns a new nodelist with one relationship
+		// (from, to, type) removed.
+		cel.Function(
+			"unrelate_nodes",
+			cel.MemberOverload(
+				"nodelist_unrelate_nodes",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.StringType, types.StringType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.UnrelateNodes),
+			),
+		),
+		// remove_edges_from returns a new nodelist without the edges of the
+		// given type originating at a node.
+		cel.Function(
+			"remove_edges_from",
+			cel.MemberOverload(
+				"nodelist_remove_edges_from",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.StringType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.RemoveEdgesFrom),
+			),
+		),
 	}
 
 	// Here we add all the functions that trigger I/O calls on the host system
