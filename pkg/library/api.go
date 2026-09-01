@@ -297,6 +297,48 @@ func (p *Protobom) Functions() []cel.EnvOption {
 				cel.FunctionBinding(functions.RemoveEdgesFrom),
 			),
 		),
+		// diff compares two documents, nodelists or nodes and returns a map
+		// describing the changes, always carrying a "count" entry. The
+		// optional boolean makes identifier changes count as changes.
+		cel.Function(
+			"diff",
+			cel.MemberOverload(
+				"nodelist_diff",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"nodelist_diff_ids",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType, types.BoolType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"document_diff",
+				[]*cel.Type{elements.DocumentType, elements.DocumentType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"document_diff_ids",
+				[]*cel.Type{elements.DocumentType, elements.DocumentType, types.BoolType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"node_diff",
+				[]*cel.Type{elements.NodeType, elements.NodeType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+			cel.MemberOverload(
+				"node_diff_ids",
+				[]*cel.Type{elements.NodeType, elements.NodeType, types.BoolType},
+				types.NewMapType(types.StringType, types.DynType),
+				cel.FunctionBinding(functions.Diff),
+			),
+		),
 	}
 
 	// Here we add all the functions that trigger I/O calls on the host system
