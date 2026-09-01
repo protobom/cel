@@ -14,6 +14,7 @@ Example SBOMs used to run these examples are also found in this directory.
 | File | Description | 
 | --- | --- |
 | [compose.cel](compose.cel) | Example of SBOM composition using `relate_node_list_at_id()` |
+| [diff.cel](diff.cel) | Compare two SBOMs and summarize their differences using `diff()`. |
 | [files.cel](files.cel) | Generate a new SBOM containing only the files found in an SBOM. |
 | [packages.cel](packages.cel) | Generate a new SBOM containing only the packages found in an SBOM. |
 | [loadsbom.cel](loadsbom.cel) | Demo of SBOM loading directly from the CEL environment. |

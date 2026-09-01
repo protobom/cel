@@ -1,0 +1,48 @@
+// This is an example of comparing two SBOMs using the Protobom/CEL
+// integration.
+//
+// === BEGIN CODE ===
+
+cel.bind(
+    report,
+    sboms[0].diff(sboms[1]),
+    {
+        "equivalent": report.count == 0,
+        "changes": report.count,
+        "nodes_added": has(report.nodelist) ? report.nodelist.added.size() : 0,
+        "nodes_removed": has(report.nodelist) ? report.nodelist.removed.size() : 0,
+        "nodes_modified": has(report.nodelist) ? report.nodelist.modified.size() : 0,
+    }
+)
+
+// === END CODE ===
+//
+// The diff() function compares two documents, nodelists or nodes and returns
+// a map describing the changes that transform the receiver into the argument.
+// Every report carries a "count" entry totaling the changes, so checking that
+// two SBOMs are equivalent needs no null checks:
+//
+//     sboms[0].diff(sboms[1]).count == 0
+//
+// A document report nests a "metadata" and a "nodelist" report, present only
+// when they carry changes, which is why the program above guards them with
+// has(). The nodelist report lists the "added" and "removed" nodes, the
+// "modified" entries (with the changed fields in their "added" and "removed"
+// nodes), the edge deltas and the root element changes.
+//
+// Nodes are paired across the two documents by their identifiers first and
+// then by the software they describe (hashes, then package URLs). Identifier
+// changes do not count as changes by default; pass true as a second argument
+// to make them count:
+//
+//     sboms[0].diff(sboms[1], true)
+//
+// To try this example, compare the two example SBOMs of the bom project
+// found in this directory:
+//   bom-binary.spdx.json
+//   bom-github.spdx.json
+//
+// The first describes the bom binary for linux/amd64, the second one the
+// GitHub repository housing its source code. The report shows how different
+// the two views of the same project are. Diffing an SBOM against itself
+// reports {"count": 0}.
