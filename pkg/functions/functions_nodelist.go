@@ -200,3 +200,104 @@ var NodesByPurlType = func(lhs, rhs ref.Val) ref.Val {
 		NodeList: nl,
 	}
 }
+
+// Intersect returns a new nodelist with the nodes and relationships common
+// to both operands.
+var Intersect = func(lhs, rhs ref.Val) ref.Val {
+	nl1, ok := lhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("intersect only applies to a nodelist, not %T", lhs.Value())
+	}
+	nl2, ok := rhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("only a nodelist can be intersected with a nodelist, not %T", rhs.Value())
+	}
+	return &elements.NodeList{
+		NodeList: nl1.Intersect(nl2),
+	}
+}
+
+// NodeGraph returns the full graph of the node with the given ID.
+var NodeGraph = func(lhs, rhs ref.Val) ref.Val {
+	id, ok := rhs.Value().(string)
+	if !ok {
+		return types.NewErr("node id must be a string")
+	}
+	nl, ok := lhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("get_node_graph only applies to NodeList")
+	}
+	graph := nl.NodeGraph(id)
+	if graph == nil {
+		graph = &sbom.NodeList{}
+	}
+	return &elements.NodeList{NodeList: graph}
+}
+
+// NodeSiblings returns the fragment with the immediate siblings of the node
+// with the given ID.
+var NodeSiblings = func(lhs, rhs ref.Val) ref.Val {
+	id, ok := rhs.Value().(string)
+	if !ok {
+		return types.NewErr("node id must be a string")
+	}
+	nl, ok := lhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("get_node_siblings only applies to NodeList")
+	}
+	siblings := nl.NodeSiblings(id)
+	if siblings == nil {
+		siblings = &sbom.NodeList{}
+	}
+	return &elements.NodeList{NodeList: siblings}
+}
+
+// GetNodesByIdentifier returns the nodes carrying an identifier of the named
+// type (such as "purl" or "cpe23") with the given value.
+func GetNodesByIdentifier(vals ...ref.Val) ref.Val {
+	if len(vals) != 3 {
+		return types.NewErr("incorrect number of params")
+	}
+	nl, ok := vals[0].Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("get_nodes_by_identifier only applies to NodeList")
+	}
+	idType, ok := vals[1].Value().(string)
+	if !ok {
+		return types.NewErr("identifier type must be a string, not %T", vals[1].Value())
+	}
+	value, ok := vals[2].Value().(string)
+	if !ok {
+		return types.NewErr("identifier value must be a string, not %T", vals[2].Value())
+	}
+
+	nodes := nl.GetNodesByIdentifier(idType, value)
+	l := make([]ref.Val, 0, len(nodes))
+	for _, n := range nodes {
+		l = append(l, &elements.Node{Node: n})
+	}
+	return types.NewRefValList(adapter.ProtobomTypeAdapter{}, l)
+}
+
+// GetMatchingNode looks up the node describing the same software as the
+// provided node, matching by hashes and package URL. It evaluates to null
+// when nothing matches and errors when more than one node does.
+var GetMatchingNode = func(lhs, rhs ref.Val) ref.Val {
+	nl, ok := lhs.Value().(*sbom.NodeList)
+	if !ok {
+		return types.NewErr("get_matching_node only applies to NodeList")
+	}
+	node, ok := rhs.Value().(*sbom.Node)
+	if !ok {
+		return types.NewErr("the argument to get_matching_node must be a node, not %T", rhs.Value())
+	}
+
+	match, err := nl.GetMatchingNode(node)
+	if err != nil {
+		return types.NewErr("matching node: %v", err)
+	}
+	if match == nil {
+		return types.NullValue
+	}
+	return &elements.Node{Node: match}
+}

@@ -50,7 +50,7 @@ func TestFunctionDiffNodeList(t *testing.T) {
 						Id:   id,
 						Name: "app",
 						Identifiers: map[int32]string{
-							int32(sbom.SoftwareIdentifierType_PURL): "pkg:generic/app@1.0.0",
+							int32(sbom.SoftwareIdentifierType_PURL): testAppPurl,
 						},
 					}},
 					Edges:        []*sbom.Edge{},

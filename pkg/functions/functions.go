@@ -447,3 +447,13 @@ var NodeGetOriginators = func(lhs ref.Val) ref.Val {
 		return types.NewErr("GetOriginators only applies to Node")
 	}
 }
+
+// NodeGetPurl returns the package URL of a node as a string. Nodes without
+// a purl, files among them, evaluate to an empty string.
+var NodeGetPurl = func(lhs ref.Val) ref.Val {
+	node, ok := lhs.Value().(*sbom.Node)
+	if !ok {
+		return types.NewErr("get_purl only applies to Node")
+	}
+	return types.String(node.Purl())
+}

@@ -20,6 +20,7 @@ const (
 	leafNodeID   = "leaf"
 	containsName = "contains"
 	incomingID   = "incoming"
+	testAppPurl  = "pkg:generic/app@1.0.0"
 )
 
 // testGraphNodeList builds the chain root -> mid -> leaf the graph function
@@ -184,4 +185,106 @@ func TestFunctionRelateNodeListAtID(t *testing.T) {
 		res := RelateNodeListAtID(testGraphNodeList(), incoming, types.String(leafNodeID), types.String("not-a-type"))
 		require.True(t, types.IsError(res))
 	})
+}
+
+func TestFunctionIntersect(t *testing.T) {
+	nl2 := &elements.NodeList{
+		NodeList: &sbom.NodeList{
+			Nodes:        []*sbom.Node{{Id: midNodeID}, {Id: "elsewhere"}},
+			Edges:        []*sbom.Edge{},
+			RootElements: []string{midNodeID},
+		},
+	}
+
+	res := Intersect(testGraphNodeList(), nl2)
+	nl, ok := res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Len(t, nl.Nodes, 1, "only the common node survives")
+	require.Equal(t, midNodeID, nl.Nodes[0].Id)
+
+	res = Intersect(testGraphNodeList(), types.String("not a nodelist"))
+	require.True(t, types.IsError(res))
+}
+
+func TestFunctionNodeGraph(t *testing.T) {
+	res := NodeGraph(testGraphNodeList(), types.String(midNodeID))
+	nl, ok := res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Len(t, nl.Nodes, 2, "the node and everything it reaches")
+
+	res = NodeGraph(testGraphNodeList(), types.String("not-here"))
+	nl, ok = res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Empty(t, nl.Nodes)
+}
+
+func TestFunctionNodeSiblings(t *testing.T) {
+	// root contains both mid and a sibling.
+	sut := testGraphNodeList()
+	sut.AddNode(&sbom.Node{Id: "sibling"})
+	sut.Edges[0].To = append(sut.Edges[0].To, "sibling")
+
+	res := NodeSiblings(sut, types.String(midNodeID))
+	nl, ok := res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Len(t, nl.Nodes, 2, "the node and its sibling")
+
+	res = NodeSiblings(sut, types.String("not-here"))
+	nl, ok = res.Value().(*sbom.NodeList)
+	require.True(t, ok, "%v", res)
+	require.Empty(t, nl.Nodes)
+}
+
+func TestFunctionGetNodesByIdentifier(t *testing.T) {
+	purl := testAppPurl
+	sut := testGraphNodeList()
+	sut.Nodes[2].Identifiers = map[int32]string{
+		int32(sbom.SoftwareIdentifierType_PURL): purl,
+	}
+
+	res := GetNodesByIdentifier(sut, types.String("purl"), types.String(purl))
+	lister, ok := res.(traits.Lister)
+	require.True(t, ok, "%v", res)
+	require.Equal(t, types.Int(1), lister.Size())
+
+	res = GetNodesByIdentifier(sut, types.String("purl"), types.String("pkg:generic/other@1.0.0"))
+	lister, ok = res.(traits.Lister)
+	require.True(t, ok)
+	require.Equal(t, types.Int(0), lister.Size())
+}
+
+func TestFunctionGetMatchingNode(t *testing.T) {
+	purl := testAppPurl
+	sut := testGraphNodeList()
+	sut.Nodes[2].Identifiers = map[int32]string{
+		int32(sbom.SoftwareIdentifierType_PURL): purl,
+	}
+
+	query := &elements.Node{Node: &sbom.Node{
+		Id:          "external-id",
+		Identifiers: map[int32]string{int32(sbom.SoftwareIdentifierType_PURL): purl},
+	}}
+
+	res := GetMatchingNode(sut, query)
+	node, ok := res.Value().(*sbom.Node)
+	require.True(t, ok, "%v", res)
+	require.Equal(t, leafNodeID, node.Id)
+
+	noMatch := &elements.Node{Node: &sbom.Node{
+		Id:          "external-id",
+		Identifiers: map[int32]string{int32(sbom.SoftwareIdentifierType_PURL): "pkg:generic/other@2.0.0"},
+	}}
+	require.Equal(t, types.NullValue, GetMatchingNode(sut, noMatch))
+}
+
+func TestFunctionNodeGetPurl(t *testing.T) {
+	purl := testAppPurl
+	node := &elements.Node{Node: &sbom.Node{
+		Id:          "a",
+		Identifiers: map[int32]string{int32(sbom.SoftwareIdentifierType_PURL): purl},
+	}}
+	require.Equal(t, types.String(purl), NodeGetPurl(node))
+
+	bare := &elements.Node{Node: &sbom.Node{Id: "b"}}
+	require.Equal(t, types.String(""), NodeGetPurl(bare))
 }

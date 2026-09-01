@@ -339,6 +339,71 @@ func (p *Protobom) Functions() []cel.EnvOption {
 				cel.FunctionBinding(functions.Diff),
 			),
 		),
+		// intersect returns a new nodelist with the nodes and relationships
+		// common to both operands.
+		cel.Function(
+			"intersect",
+			cel.MemberOverload(
+				"nodelist_intersect",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.Intersect),
+			),
+		),
+		// get_node_graph returns the full graph of the node with the given
+		// ID.
+		cel.Function(
+			"get_node_graph",
+			cel.MemberOverload(
+				"nodelist_node_graph",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.NodeGraph),
+			),
+		),
+		// get_node_siblings returns the fragment with the immediate
+		// siblings of the node with the given ID.
+		cel.Function(
+			"get_node_siblings",
+			cel.MemberOverload(
+				"nodelist_node_siblings",
+				[]*cel.Type{elements.NodeListType, types.StringType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.NodeSiblings),
+			),
+		),
+		// get_nodes_by_identifier returns the nodes carrying an identifier
+		// of the named type with the given value.
+		cel.Function(
+			"get_nodes_by_identifier",
+			cel.MemberOverload(
+				"nodelist_nodes_by_identifier",
+				[]*cel.Type{elements.NodeListType, types.StringType, types.StringType},
+				types.NewListType(elements.NodeType),
+				cel.FunctionBinding(functions.GetNodesByIdentifier),
+			),
+		),
+		// get_matching_node looks up the node describing the same software
+		// as the provided node, matching by hashes and package URL.
+		cel.Function(
+			"get_matching_node",
+			cel.MemberOverload(
+				"nodelist_matching_node",
+				[]*cel.Type{elements.NodeListType, elements.NodeType},
+				elements.NodeType,
+				cel.BinaryBinding(functions.GetMatchingNode),
+			),
+		),
+		// get_purl returns the package URL of a node as a string.
+		cel.Function(
+			"get_purl",
+			cel.MemberOverload(
+				"node_get_purl",
+				[]*cel.Type{elements.NodeType},
+				types.StringType,
+				cel.UnaryBinding(functions.NodeGetPurl),
+			),
+		),
 	}
 
 	// Here we add all the functions that trigger I/O calls on the host system
