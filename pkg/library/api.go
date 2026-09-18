@@ -350,6 +350,103 @@ func (p *Protobom) Functions() []cel.EnvOption {
 				cel.BinaryBinding(functions.Intersect),
 			),
 		),
+		// absorb completes the receiver with what the argument knows,
+		// merging collections entry by entry and never overriding what the
+		// receiver states.
+		cel.Function(
+			"absorb",
+			cel.MemberOverload(
+				"document_absorb",
+				[]*cel.Type{elements.DocumentType, elements.DocumentType},
+				elements.DocumentType,
+				cel.BinaryBinding(functions.Absorb),
+			),
+			cel.MemberOverload(
+				"nodelist_absorb",
+				[]*cel.Type{elements.NodeListType, elements.NodeListType},
+				elements.NodeListType,
+				cel.BinaryBinding(functions.Absorb),
+			),
+			cel.MemberOverload(
+				"node_absorb",
+				[]*cel.Type{elements.NodeType, elements.NodeType},
+				elements.NodeType,
+				cel.BinaryBinding(functions.Absorb),
+			),
+		),
+		// dedupe collapses the nodes describing the same component into
+		// one, rewiring their relationships to the survivor.
+		cel.Function(
+			"dedupe",
+			cel.MemberOverload(
+				"document_dedupe",
+				[]*cel.Type{elements.DocumentType},
+				elements.DocumentType,
+				cel.UnaryBinding(functions.Dedupe),
+			),
+			cel.MemberOverload(
+				"nodelist_dedupe",
+				[]*cel.Type{elements.NodeListType},
+				elements.NodeListType,
+				cel.UnaryBinding(functions.Dedupe),
+			),
+		),
+		// same_component reports whether two nodes describe the same
+		// component, by hashes or purl.
+		cel.Function(
+			"same_component",
+			cel.MemberOverload(
+				"node_same_component",
+				[]*cel.Type{elements.NodeType, elements.NodeType},
+				types.BoolType,
+				cel.BinaryBinding(functions.SameComponent),
+			),
+		),
+		// hashes_conflict reports whether two nodes disagree on a hash
+		// algorithm they both carry.
+		cel.Function(
+			"hashes_conflict",
+			cel.MemberOverload(
+				"node_hashes_conflict",
+				[]*cel.Type{elements.NodeType, elements.NodeType},
+				types.BoolType,
+				cel.BinaryBinding(functions.HashesConflict),
+			),
+		),
+		// graft hangs the graph reachable from a node of another nodelist
+		// under one of the receiver's nodes.
+		cel.Function(
+			"graft",
+			cel.MemberOverload(
+				"document_graft",
+				[]*cel.Type{elements.DocumentType, cel.StringType, elements.NodeListType, cel.StringType, cel.StringType},
+				elements.DocumentType,
+				cel.FunctionBinding(functions.Graft),
+			),
+			cel.MemberOverload(
+				"nodelist_graft",
+				[]*cel.Type{elements.NodeListType, cel.StringType, elements.NodeListType, cel.StringType, cel.StringType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.Graft),
+			),
+		),
+		// graft_into folds a node of another nodelist into one of the
+		// receiver's nodes and hangs its graph below it.
+		cel.Function(
+			"graft_into",
+			cel.MemberOverload(
+				"document_graft_into",
+				[]*cel.Type{elements.DocumentType, cel.StringType, elements.NodeListType, cel.StringType},
+				elements.DocumentType,
+				cel.FunctionBinding(functions.GraftInto),
+			),
+			cel.MemberOverload(
+				"nodelist_graft_into",
+				[]*cel.Type{elements.NodeListType, cel.StringType, elements.NodeListType, cel.StringType},
+				elements.NodeListType,
+				cel.FunctionBinding(functions.GraftInto),
+			),
+		),
 		// get_node_graph returns the full graph of the node with the given
 		// ID.
 		cel.Function(
