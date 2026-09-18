@@ -76,6 +76,10 @@ sboms[0].node_list.get_root_nodes()[0].name
 | `add(nodelist)` | NodeList | NodeList | Returns the union of both node lists | — | ✔️ | — |
 | `intersect(nodelist)` | NodeList | NodeList | Returns the nodes and relationships common to both node lists | — | ✔️ | — |
 | `relate_node_list_at_id(nodelist, id, type)` | NodeList, string, string | same as receiver | Relates the nodes of a NodeList to the node with the given identifier through a relationship of the named type | ✔️ | ✔️ | — |
+| `absorb(other)` | same as receiver | same as receiver | Completes the receiver with what the argument knows: fields it lacks are filled and collections (hashes, identifiers, licenses, references, properties; for documents also tools, authors and document types) are merged entry by entry. Nothing the receiver states is overridden. Node lists match nodes by id | ✔️ | ✔️ | ✔️ |
+| `dedupe()` | — | same as receiver | Collapses the nodes describing the same component (see `same_component`) into one each. The first in list order survives and absorbs the rest; every relationship and root reference is rewired to it | ✔️ | ✔️ | — |
+| `graft(id, nodelist, root_id, type)` | string, NodeList, string, string | same as receiver | Copies the graph reachable from `root_id` in the given NodeList, with fresh identifiers, and relates its root to the node `id` of the receiver through a relationship of the named type. Only outgoing relationships are followed | ✔️ | ✔️ | — |
+| `graft_into(id, nodelist, root_id)` | string, NodeList, string | same as receiver | Like `graft`, but the node `root_id` is absorbed into the node `id` instead of being related to it: its graph hangs below `id` and the relationships that left or reached it now leave or reach `id` | ✔️ | ✔️ | — |
 | `unrelate_nodes(from, to, type)` | string, string, string | NodeList | Removes the relationship of the named type between two nodes. Other destinations of the same relation are preserved | — | ✔️ | — |
 | `remove_edges_from(id, type)` | string, string | NodeList | Removes all the relationships of the named type originating at a node | — | ✔️ | — |
 
@@ -88,6 +92,17 @@ result is a new element with the change applied.
 
 ⚠️ Known limitation: the Document overload of `to_document()` is registered
 but currently fails at evaluation time.
+
+### Component identity
+
+| Function | Arguments | Returns | Description | Document | NodeList | Node |
+| --- | --- | --- | --- | --- | --- | --- |
+| `same_component(node)` | Node | bool | Whether both nodes describe the same component: the same kind of node, agreeing on every hash algorithm they share, or, when they share none, carrying the same purl. A disagreeing hash is final | — | — | ✔️ |
+| `hashes_conflict(node)` | Node | bool | Whether the nodes state different values for a hash algorithm they both carry | — | — | ✔️ |
+
+`dedupe()` collapses exactly the nodes `same_component()` would pair, with
+one safeguard: a node never joins a group when its hashes conflict with
+any member, so a node without hashes cannot bridge two whose hashes differ.
 
 ## Diffing
 
