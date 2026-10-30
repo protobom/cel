@@ -30,7 +30,7 @@ require (
 )
 
 require (
-	cel.dev/cel-go v0.32.0
+	cel.dev/cel-go v0.33.0
 	github.com/CycloneDX/cyclonedx-go v0.12.0 // indirect
 	github.com/anchore/go-struct-converter v0.1.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
