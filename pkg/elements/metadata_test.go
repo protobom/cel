@@ -100,10 +100,15 @@ func TestGetMetadataGet(t *testing.T) {
 			require.NoError(t, err)
 			docdata, ok := v.Value().([]*sbom.Person)
 			require.True(t, ok)
+			// Since protobom v0.7.0, the SPDX reader splits the "name (email)"
+			// creator string into the person's name and email fields.
 			expect := []*sbom.Person{{
-				Name: "Dependabot (bot@dependa.net)",
+				Name:  "Dependabot",
+				Email: "bot@dependa.net",
 			}}
+			require.Len(t, docdata, 1)
 			require.Equal(t, expect[0].Name, docdata[0].Name)
+			require.Equal(t, expect[0].Email, docdata[0].Email)
 		}},
 		// TODO(puerco): More SBOMs, test all fiuelds
 	} {
