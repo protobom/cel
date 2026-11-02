@@ -49,8 +49,8 @@ github.com/olekukonko/tablewriter v1.1.5 h1:4LoZSfMySpMQY3PT8RWJsJeuEuMIoo9xGRgv
 github.com/olekukonko/tablewriter v1.1.5/go.mod h1:+kedxuyTtgoZLwif3P1Em4hARJs+mVnzKxmsCL/C5RY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/protobom/protobom v0.6.2 h1:HJTEEnYyU1m3VWoVj0TkDqArWC3Q2CvSFXHUpCkRkoI=
-github.com/protobom/protobom v0.6.2/go.mod h1:WtLWrIyJthYwjbNqn4uMWzculpjNrmVYY78FgCRXe7w=
+github.com/protobom/protobom v0.7.0 h1:xz5DQApHoOGKLYYXcwfXYB7RoZgZl1/H2674AoqJ0x8=
+github.com/protobom/protobom v0.7.0/go.mod h1:Lzl3cG2qhCEzK6N6x2LyYWyYdHJTBRU1zl6UqTBuDSI=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sirupsen/logrus v1.10.2 h1:G2SED73/qrAu6YwbdxOD6peLkCBI3z7L+ykJFTXJBBo=
 github.com/sirupsen/logrus v1.10.2/go.mod h1:SLEg8TqYulVKKfIGHldVp2K2aYz2DKSVBq4g/H5bR7Q=
